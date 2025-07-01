@@ -41,7 +41,7 @@ function createGrid() {
             cell.element.id = `cell-${x}-${y}`;
             cell.element.addEventListener('click', () => handleClick(cell));
             cell.element.addEventListener('mouseenter', () => {
-                if (mouseDown && mode === 'wall') handleClick(cell); // add wall on mouse drag
+                if (mouseDown && mode === 'wall') handleClick(cell); // add/remove wall on mouse drag
             });
             gridEl.appendChild(cell.element);
             row.push(cell);
@@ -102,6 +102,7 @@ function getNeighbors(cell) {
 }
 
 async function startAStar() {
+    clearPath(); // clear previous path
     if (!start || !end) return alert("Set both start and end points.");
 
     let openSet = [start];
@@ -166,6 +167,15 @@ function resetGrid() {
     createGrid();
     start = null;
     end = null;
+}
+
+function clearPath() {
+    for (let row of grid) {
+        for (let cell of row) {
+            cell.element.classList.remove('path', 'visited');
+        }
+    }
+    weightDisplay.innerHTML = '';
 }
 
 createGrid();
