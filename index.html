@@ -17,19 +17,18 @@
     </head>
 
     <body>
-        <div class="root">
-            <h1>A* Pathfinding Visualizer</h1>
-            <div>
-                <button onclick='setMode("start")'>Set Start</button>
-                <button onclick='setMode("end")'>Set End</button>
-                <button onclick='setMode("wall")'>Add Wall (Click and Drag for multiple)</button>
-                <button onclick='startAStar()'>Start A*</button>
-                <button onclick='clearPath()'>Clear A*</button>
-                <button onclick='resetGrid()'>Reset</button>
-                <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
-            </div>
-            <div id='grid'></div>
+        <div id="sidebar">
+            <button onclick='setMode("start")'>Set Start</button>
+            <button onclick='setMode("end")'>Set End</button>
+            <button onclick='setMode("wall")'>Add Wall</button>
+            <button onclick='startAStar()'>Start A*</button>
+            <button onclick='resetGrid()'>Reset</button>
+            <button onclick='clearPath()'>Clear A*</button>
+            <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
+        </div>
+        <div id="main">
             <div id='weightDisplay'></div>
+            <div id='grid'></div>
         </div>
         
         <script src="main.js"></script>

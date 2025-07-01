@@ -85,14 +85,14 @@ function getNeighbors(cell) {
     ];
     const dirs = diagonalToggle.checked ? cardinalDirs.concat(diagonalDirs) : cardinalDirs;
     return dirs.map(([dx, dy]) => {
-    const x = cell.x + dx, y = cell.y + dy;
+        const x = cell.x + dx, y = cell.y + dy;
         if (x >= 0 && x < COLS && y >= 0 && y < ROWS) {
             const neighbor = grid[y][x];
             if (neighbor.isWall) return null;
             if (dx !== 0 && dy !== 0) {
                 const n1 = grid[cell.y][cell.x + dx];
                 const n2 = grid[cell.y + dy][cell.x];
-                if (n1.isWall || n2.isWall) return null;
+                if (n1.isWall && n2.isWall) return null; // no corner cutting
             }
             return neighbor;
         }
