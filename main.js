@@ -1,12 +1,11 @@
 /* 
 ----------------------------------
 Pathfinder Visualizer
-1.0.0
+1.2
 
 TODO:
-    - Add diagonal movement support
     - Paragraphical messages for no path found, start/end not set, etc.
-    - 
+    - better ui
 
 ----------------------------------
 */
@@ -15,8 +14,14 @@ const ROWS = 50, COLS = 50;
 
 
 let grid = [], start = null, end = null, mode = 'wall';
+let mouseDown = false;
 
 const gridEl = document.getElementById('grid');
+const weightDisplay = document.getElementById('weightDisplay');
+const diagonalToggle = document.getElementById('diagonalToggle');
+
+document.body.addEventListener('mousedown', () => mouseDown = true);
+document.body.addEventListener('mouseup', () => mouseDown = false);
 
 function createGrid() {
     grid = [];
@@ -34,6 +39,9 @@ function createGrid() {
             cell.element.className = 'cell';
             cell.element.id = `cell-${x}-${y}`;
             cell.element.addEventListener('click', () => handleClick(cell));
+            cell.element.addEventListener('mouseenter', () => {
+                if (mouseDown && mode === 'wall') handleClick(cell); // add wall on mouse drag
+            });
             gridEl.appendChild(cell.element);
             row.push(cell);
         }
@@ -66,17 +74,30 @@ function distance(a, b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); // Manhattan distance
 }
 
+
 function getNeighbors(cell) {
-    const dirs = [[1,0],[-1,0],[0,1],[0,-1]]; // NSEW
-    return dirs.map(([dx,dy]) => { // dir x/y
-        const x = cell.x + dx, y = cell.y + dy;
+    const cardinalDirs = [
+        [1, 0], [-1, 0], [0, 1], [0, -1]
+    ];
+    const diagonalDirs = [
+        [1, 1], [-1, -1], [1, -1], [-1, 1]
+    ];
+    const dirs = diagonalToggle.checked ? cardinalDirs.concat(diagonalDirs) : cardinalDirs;
+    return dirs.map(([dx, dy]) => {
+    const x = cell.x + dx, y = cell.y + dy;
         if (x >= 0 && x < COLS && y >= 0 && y < ROWS) {
-            return grid[y][x];
+            const neighbor = grid[y][x];
+            if (neighbor.isWall) return null;
+            if (dx !== 0 && dy !== 0) {
+                const n1 = grid[cell.y][cell.x + dx];
+                const n2 = grid[cell.y + dy][cell.x];
+                if (n1.isWall || n2.isWall) return null;
+            }
+            return neighbor;
         }
-        console.log(`Cell was out of bounds: (${x}, ${y})`); // debug log for out of bounds
-        alert(`Cell was out of bounds: (${x}, ${y})`); // alert for out of bounds
+        alert(`Cell was out of bounds: (${x}, ${y})`);
         return null;
-    }).filter(n => n && !n.isWall); // if n is not null and not a wall (from above)
+    }).filter(n => n); // if null (out of bounds or wall)
 }
 
 async function startAStar() {
@@ -121,7 +142,9 @@ async function startAStar() {
 
         for (let neighbor of getNeighbors(current)) {
             if (closedSet.includes(neighbor)) continue; // already been
-            let tentativeG = current.g + 1; // TODO consider diagonal movement cost or special costs
+            let isDiagonal = neighbor.x !== current.x && neighbor.y !== current.y;
+            let tentativeG = current.g + (isDiagonal ? Math.SQRT2 : 1);
+            // 1.4 cost for diagonal, 1 for straight
 
             if (!openSet.includes(neighbor) || tentativeG < neighbor.g) { // if not in open set or found a better path
                 neighbor.g = tentativeG;

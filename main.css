@@ -28,3 +28,7 @@ body {
 .visited { background-color: lightblue; }
 .path { background-color: yellow; }
 button { margin: 5px; }
+#weightDisplay {
+  margin-top: 10px;
+  font-size: 16px;
+}

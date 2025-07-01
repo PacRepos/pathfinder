@@ -25,14 +25,16 @@
                 <button onclick='setMode("wall")'>Add Wall</button>
                 <button onclick='startAStar()'>Start A*</button>
                 <button onclick='resetGrid()'>Reset</button>
+                <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
             </div>
             <div id='grid'></div>
+            <div id='weightDisplay'></div>
         </div>
         
         <script src="main.js"></script>
 
         <footer>
-            <p>&copy; 2025 pacrepos</p>
+            <p>&copy; 2025 pacrepos (under MIT license)</p>
         </footer>
     </body>
 </html>
