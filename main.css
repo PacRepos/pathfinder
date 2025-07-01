@@ -21,7 +21,7 @@ body {
   color: white;
   padding: 20px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 10px;
 }
 #sidebar button, #sidebar label {
