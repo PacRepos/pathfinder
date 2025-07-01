@@ -9,6 +9,7 @@ body {
   margin: 0;
   padding: 20px;
 }
+
 #grid {
   display: grid;
   grid-template-columns: repeat(50, 15px);
@@ -22,12 +23,15 @@ body {
   background-color: white;
   border: 1px solid #eee;
 }
+
 .start { background-color: green; }
 .end { background-color: red; }
 .wall { background-color: black; }
 .visited { background-color: lightblue; }
 .path { background-color: yellow; }
+
 button { margin: 5px; }
+
 #weightDisplay {
   margin-top: 10px;
   font-size: 16px;

@@ -26,6 +26,7 @@ document.body.addEventListener('mouseup', () => mouseDown = false);
 function createGrid() {
     grid = [];
     gridEl.innerHTML = '';
+    weightDisplay.innerHTML = '';
     for (let y = 0; y < ROWS; y++) {
         const row = [];
         for (let x = 0; x < COLS; x++) {
@@ -102,7 +103,6 @@ function getNeighbors(cell) {
 
 async function startAStar() {
     if (!start || !end) return alert("Set both start and end points.");
-    if (start === end) return alert("Start and end points cannot be the same.");
 
     let openSet = [start];
     let closedSet = [];
@@ -134,6 +134,7 @@ async function startAStar() {
                     await new Promise(r => setTimeout(r, 10));
                 }
             }
+            weightDisplay.textContent = `Total Path Weight: ${current.g.toFixed(2)}`;
             return;
         }
 
