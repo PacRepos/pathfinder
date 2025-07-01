@@ -26,7 +26,7 @@ document.body.addEventListener('mouseup', () => mouseDown = false);
 function createGrid() {
     grid = [];
     gridEl.innerHTML = '';
-    weightDisplay.innerHTML = '';
+    weightDisplay.innerHTML = ' '; // empty space to not cause layout shift
     for (let y = 0; y < ROWS; y++) {
         const row = [];
         for (let x = 0; x < COLS; x++) {

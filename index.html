@@ -8,11 +8,12 @@
         <meta name="author" content="pacrepos">
 
         <link rel="stylesheet" href="main.css">
+
         <link rel="icon" type="image/x-icon" href="favicon.ico">
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-        <link rel="manifest" href="/site.webmanifest">
+        <!-- <link rel="manifest" href="/site.webmanifest"> --> <!-- web manifest causing errors -->
 
     </head>
 
@@ -26,6 +27,7 @@
             <button onclick='resetGrid()'>Reset</button>
             <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
         </div>
+        
         <div id="main">
             <div id='weightDisplay'></div>
             <div id='grid'></div>
