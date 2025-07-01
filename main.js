@@ -1,11 +1,14 @@
 /* 
 ----------------------------------
 Pathfinder Visualizer
-1.2
+1.4.1
 
 TODO:
     - Paragraphical messages for no path found, start/end not set, etc.
     - better ui
+    - add more algorithms (Dijkstra, etc.)
+    - add weights to cells (click to set weight)
+    - stop marking start as path
 
 ----------------------------------
 */
@@ -140,8 +143,9 @@ async function startAStar() {
         }
 
         closedSet.push(current);
-        current.element.classList.add('visited');
-
+        if (current !== start) {
+            current.element.classList.add('visited');
+        }
         for (let neighbor of getNeighbors(current)) {
             if (closedSet.includes(neighbor)) continue; // already been
             let isDiagonal = neighbor.x !== current.x && neighbor.y !== current.y;
