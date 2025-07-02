@@ -17,6 +17,7 @@ const ROWS = 50, COLS = 50;
 
 let grid = [], start = null, end = null, mode = 'wall';
 let mouseDown = false;
+let customWeight = 1;
 
 const gridEl = document.getElementById('grid');
 const weightDisplay = document.getElementById('weightDisplay');
@@ -34,6 +35,8 @@ function createGrid() {
         for (let x = 0; x < COLS; x++) {
             const cell = {
                 x, y,
+                label: document.createElement('div'),
+                weight: 1,
                 isWall: false,
                 f: 0, g: 0, h: 0, // f = g + h, g: cost start to current, h: cost to end
                 parent: null,
@@ -45,6 +48,16 @@ function createGrid() {
             cell.element.addEventListener('mouseenter', () => {
                 if (mouseDown && mode === 'wall') handleClick(cell); // add/remove wall on mouse drag
             });
+
+            // cell.label.style.cssText = 
+            // 'position:absolute;width:100%;height:100%;font-size:10px;
+            // text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
+
+            // cell.element.style.position = 'relative';
+
+            cell.label.innerHTML = cell.weight;
+            cell.element.appendChild(cell.label);
+
             gridEl.appendChild(cell.element);
             row.push(cell);
         }
@@ -54,6 +67,11 @@ function createGrid() {
 
 function setMode(m) {
     mode = m;
+}
+
+function updateWeight() {
+    const input = document.getElementById('weightInput');
+    customWeight = Math.max(1, parseInt(input.value));
 }
 
 function handleClick(cell) {
@@ -69,6 +87,17 @@ function handleClick(cell) {
         if (cell !== start && cell !== end) { // toggle wall state
             cell.isWall = !cell.isWall;
             cell.element.classList.toggle('wall');
+        }
+    } else if (mode === 'weight') {
+        if (!cell.isWall && cell !== start && cell !== end) {
+            cell.weight = customWeight;
+            // cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
+            cell.label.innerHTML = customWeight;
+            /*
+            if (document.getElementById('showWeightsToggle').checked) {
+                cell.label.style.display = 'block';
+            }
+                */
         }
     }
 }
@@ -146,7 +175,7 @@ async function startAStar() {
                     await new Promise(r => setTimeout(r, 10));
                 }
             }
-            weightDisplay.textContent = `Total Path Weight: ${current.g.toFixed(2)}`;
+            weightDisplay.innerHTML = `Total Path Weight: ${current.g.toFixed(2)}`;
             return;
         }
 
@@ -157,7 +186,8 @@ async function startAStar() {
         for (let neighbor of getNeighbors(current)) {
             if (closedSet.includes(neighbor)) continue; // already been
             let isDiagonal = neighbor.x !== current.x && neighbor.y !== current.y;
-            let tentativeG = current.g + (isDiagonal ? Math.SQRT2 : 1);
+            let baseCost = isDiagonal ? Math.SQRT2 : 1;
+            let tentativeG = current.g + baseCost * neighbor.weight;
             // 1.4 cost for diagonal, 1 for straight
 
             if (!openSet.includes(neighbor) || tentativeG < neighbor.g) { // if not in open set or found a better path
@@ -170,10 +200,21 @@ async function startAStar() {
         }
         await new Promise(r => setTimeout(r, 5)); // visualize pause (change as needed)
     }
-
-    console.log("No path found."); // TODO create a paragraphical message
     alert("No path found.");
 }
+
+/*
+function toggleWeightLabels() {
+    const show = document.getElementById('showWeightsToggle').checked;
+    for (let row of grid) {
+        for (let cell of row) {
+            if (cell.weight > 1) {
+                cell.label.style.display = show ? 'block' : 'none';
+            }
+        }
+    }
+}
+    */
 
 function resetGrid() {
     createGrid();
@@ -185,6 +226,10 @@ function clearPath() {
     for (let row of grid) {
         for (let cell of row) {
             cell.element.classList.remove('path', 'visited');
+            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
+                // cell.element.style.backgroundColor = 'white';
+                // cell.label.style.display = 'none';
+            }
         }
     }
     weightDisplay.innerHTML = '';
