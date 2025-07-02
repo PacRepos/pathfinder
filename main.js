@@ -219,8 +219,6 @@ function clearPath() {
             if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
                 cell.element.style.backgroundColor = 'white';
                 cell.label.style.display = 'none';
-            } else {
-                cell.element.style.backgroundColor = 'white';
             }
         }
     }
