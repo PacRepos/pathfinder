@@ -8,7 +8,6 @@ TODO:
     - better ui
     - add more algorithms (Dijkstra, etc.)
     - add weights to cells (click to set weight)
-    - stop marking start as path
 
 ----------------------------------
 */
@@ -98,18 +97,17 @@ function getNeighbors(cell) {
                 const nx2 = cell.x;
                 const ny2 = cell.y + dy;
 
-                if (
+                if ( // extra out of bounds check cause top was buggy
                     nx1 < 0 || nx1 >= COLS || ny2 < 0 || ny2 >= ROWS ||
                     nx2 < 0 || nx2 >= COLS || ny1 < 0 || ny1 >= ROWS
                 ) return null;
 
-            const n1 = grid[ny1][nx1];
-            const n2 = grid[ny2][nx2];
+                const n1 = grid[ny1][nx1];
+                const n2 = grid[ny2][nx2];
                 if (n1.isWall && n2.isWall) return null; // no corner cutting
             }
             return neighbor;
         }
-        alert(`Cell was out of bounds: (${x}, ${y})`);
         return null;
     }).filter(n => n); // if null (out of bounds or wall)
 }
