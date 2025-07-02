@@ -49,11 +49,9 @@ function createGrid() {
                 if (mouseDown && mode === 'wall') handleClick(cell); // add/remove wall on mouse drag
             });
 
-            // cell.label.style.cssText = 
-            // 'position:absolute;width:100%;height:100%;font-size:10px;
-            // text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
+            cell.label.style.cssText = 'position:absolute;width:100%;height:100%;font-size:10px;text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
 
-            // cell.element.style.position = 'relative';
+            cell.element.style.position = 'relative';
 
             cell.label.innerHTML = cell.weight;
             cell.element.appendChild(cell.label);
@@ -93,6 +91,8 @@ function handleClick(cell) {
             cell.weight = customWeight;
             // cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
             cell.label.innerHTML = customWeight;
+
+            cell.label.style.display = 'block';
             /*
             if (document.getElementById('showWeightsToggle').checked) {
                 cell.label.style.display = 'block';
