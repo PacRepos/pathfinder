@@ -17,7 +17,7 @@ const ROWS = 50, COLS = 50;
 
 
 let grid = [], start = null, end = null, mode = 'wall';
-let customWeight = 1;
+// let customWeight = 1;
 let mouseDown = false;
 
 const gridEl = document.getElementById('grid');
@@ -47,10 +47,12 @@ function createGrid() {
             cell.element.addEventListener('mouseenter', () => {
                 if (mouseDown && mode === 'wall') handleClick(cell); // add/remove wall on mouse drag
             });
+            /*
             cell.label.style.cssText = 'position:absolute;width:100%;height:100%;font-size:10px;text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
             cell.label.textContent = cell.weight;
             cell.element.style.position = 'relative';
             cell.element.appendChild(cell.label);
+            */
             gridEl.appendChild(cell.element);
             row.push(cell);
         }
@@ -61,12 +63,12 @@ function createGrid() {
 function setMode(m) {
     mode = m;
 }
-
+/*
 function updateWeight() {
     const input = document.getElementById('weightInput');
     customWeight = Math.max(1, parseInt(input.value));
 }
-
+*/
 function handleClick(cell) {
     if (mode === 'start') {
         if (start) start.element.classList.remove('start'); // handling if start already exists
@@ -81,7 +83,9 @@ function handleClick(cell) {
             cell.isWall = !cell.isWall;
             cell.element.classList.toggle('wall');
         }
-    } else if (mode === 'weight') {
+    } 
+    /*
+    else if (mode === 'weight') {
         if (!cell.isWall && cell !== start && cell !== end) {
             cell.weight = customWeight;
             cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`; 
@@ -92,6 +96,7 @@ function handleClick(cell) {
             }
         }
     }
+        */
 }
 
 function distance(a, b) {
@@ -184,7 +189,7 @@ async function startAStar() {
 
             if (!openSet.includes(neighbor) || tentativeG < neighbor.g) {
                 neighbor.g = tentativeG;
-                neighbor.h = heuristic(neighbor, end);
+                neighbor.h = distance(neighbor, end);
                 neighbor.f = neighbor.g + neighbor.h;
                 neighbor.parent = current;
                 if (!openSet.includes(neighbor)) openSet.push(neighbor);
@@ -194,7 +199,7 @@ async function startAStar() {
     }
     alert("No path found.");
 }
-
+/*
 function toggleWeightLabels() {
     const show = document.getElementById('showWeightsToggle').checked;
     for (let row of grid) {
@@ -205,6 +210,7 @@ function toggleWeightLabels() {
         }
     }
 }
+    */
 
 function resetGrid() {
     createGrid();
@@ -216,10 +222,12 @@ function clearPath() {
     for (let row of grid) {
         for (let cell of row) {
             cell.element.classList.remove('path', 'visited');
+            /*
             if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
                 cell.element.style.backgroundColor = 'white';
                 cell.label.style.display = 'none';
             }
+                */
         }
     }
     weightDisplay.innerHTML = '';
