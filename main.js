@@ -17,7 +17,6 @@ const ROWS = 50, COLS = 50;
 
 
 let grid = [], start = null, end = null, mode = 'wall';
-// let customWeight = 1;
 let mouseDown = false;
 
 const gridEl = document.getElementById('grid');
@@ -47,12 +46,6 @@ function createGrid() {
             cell.element.addEventListener('mouseenter', () => {
                 if (mouseDown && mode === 'wall') handleClick(cell); // add/remove wall on mouse drag
             });
-            /*
-            cell.label.style.cssText = 'position:absolute;width:100%;height:100%;font-size:10px;text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
-            cell.label.textContent = cell.weight;
-            cell.element.style.position = 'relative';
-            cell.element.appendChild(cell.label);
-            */
             gridEl.appendChild(cell.element);
             row.push(cell);
         }
@@ -63,12 +56,7 @@ function createGrid() {
 function setMode(m) {
     mode = m;
 }
-/*
-function updateWeight() {
-    const input = document.getElementById('weightInput');
-    customWeight = Math.max(1, parseInt(input.value));
-}
-*/
+
 function handleClick(cell) {
     if (mode === 'start') {
         if (start) start.element.classList.remove('start'); // handling if start already exists
@@ -83,20 +71,7 @@ function handleClick(cell) {
             cell.isWall = !cell.isWall;
             cell.element.classList.toggle('wall');
         }
-    } 
-    /*
-    else if (mode === 'weight') {
-        if (!cell.isWall && cell !== start && cell !== end) {
-            cell.weight = customWeight;
-            cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`; 
-            // shade orange (darker = more weight)
-            cell.label.textContent = customWeight;
-            if (document.getElementById('showWeightsToggle').checked) { // display weights
-                cell.label.style.display = 'block';
-            }
-        }
     }
-        */
 }
 
 function distance(a, b) {
@@ -118,16 +93,6 @@ function getNeighbors(cell) {
             const neighbor = grid[y][x];
             if (neighbor.isWall) return null;
             if (dx !== 0 && dy !== 0) {
-                const nx1 = cell.x + dx;
-                const ny1 = cell.y;
-                const nx2 = cell.x;
-                const ny2 = cell.y + dy;
-
-                if (
-                    nx1 < 0 || nx1 >= COLS || ny2 < 0 || ny2 >= ROWS ||
-                    nx2 < 0 || nx2 >= COLS || ny1 < 0 || ny1 >= ROWS
-                ) return null;
-
                 const n1 = grid[cell.y][cell.x + dx];
                 const n2 = grid[cell.y + dy][cell.x];
                 if (n1.isWall && n2.isWall) return null; // no corner cutting
@@ -182,35 +147,25 @@ async function startAStar() {
             current.element.classList.add('visited');
         }
         for (let neighbor of getNeighbors(current)) {
-            if (closedSet.includes(neighbor)) continue;
+            if (closedSet.includes(neighbor)) continue; // already been
             let isDiagonal = neighbor.x !== current.x && neighbor.y !== current.y;
-            let baseCost = isDiagonal ? Math.SQRT2 : 1;
-            let tentativeG = current.g + baseCost * neighbor.weight;
+            let tentativeG = current.g + (isDiagonal ? Math.SQRT2 : 1);
+            // 1.4 cost for diagonal, 1 for straight
 
-            if (!openSet.includes(neighbor) || tentativeG < neighbor.g) {
+            if (!openSet.includes(neighbor) || tentativeG < neighbor.g) { // if not in open set or found a better path
                 neighbor.g = tentativeG;
                 neighbor.h = distance(neighbor, end);
                 neighbor.f = neighbor.g + neighbor.h;
                 neighbor.parent = current;
-                if (!openSet.includes(neighbor)) openSet.push(neighbor);
+                if (!openSet.includes(neighbor)) openSet.push(neighbor); // add to open set
             }
         }
         await new Promise(r => setTimeout(r, 5)); // visualize pause (change as needed)
     }
+
+    console.log("No path found."); // TODO create a paragraphical message
     alert("No path found.");
 }
-/*
-function toggleWeightLabels() {
-    const show = document.getElementById('showWeightsToggle').checked;
-    for (let row of grid) {
-        for (let cell of row) {
-            if (cell.weight > 1) {
-                cell.label.style.display = show ? 'block' : 'none';
-            }
-        }
-    }
-}
-    */
 
 function resetGrid() {
     createGrid();
@@ -222,12 +177,6 @@ function clearPath() {
     for (let row of grid) {
         for (let cell of row) {
             cell.element.classList.remove('path', 'visited');
-            /*
-            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
-                cell.element.style.backgroundColor = 'white';
-                cell.label.style.display = 'none';
-            }
-                */
         }
     }
     weightDisplay.innerHTML = '';
