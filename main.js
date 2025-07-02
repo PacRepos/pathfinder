@@ -93,8 +93,18 @@ function getNeighbors(cell) {
             const neighbor = grid[y][x];
             if (neighbor.isWall) return null;
             if (dx !== 0 && dy !== 0) {
-                const n1 = grid[cell.y][cell.x + dx];
-                const n2 = grid[cell.y + dy][cell.x];
+                const nx1 = cell.x + dx;
+                const ny1 = cell.y;
+                const nx2 = cell.x;
+                const ny2 = cell.y + dy;
+
+                if (
+                    nx1 < 0 || nx1 >= COLS || ny2 < 0 || ny2 >= ROWS ||
+                    nx2 < 0 || nx2 >= COLS || ny1 < 0 || ny1 >= ROWS
+                ) return null;
+
+            const n1 = grid[ny1][nx1];
+            const n2 = grid[ny2][nx2];
                 if (n1.isWall && n2.isWall) return null; // no corner cutting
             }
             return neighbor;
