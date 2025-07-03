@@ -69,8 +69,8 @@ function setMode(m) {
         'weight': 'Add Weight'
     };
     const label = buttonMap[m];
-    if (label) {
-        const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.textContent.trim() === label);
+    if (label) { // search by label; probably not the best way but works
+        const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.innerHTML.trim() === label);
         if (btn) btn.classList.add('active');
     }
 }
