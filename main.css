@@ -27,6 +27,8 @@ body {
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s;
 }
 #sidebar button:hover {
   background-color: #3e5871;
