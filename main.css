@@ -37,6 +37,7 @@ body {
   background-color: #1abc9c;
 }
 #main {
+  background-color: #888;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -54,18 +55,21 @@ body {
   grid-template-columns: repeat(50, 15px);
   grid-template-rows: repeat(50, 15px);
   gap: 1px;
-  background-color: #ddd;
-  border: 1px solid #ccc
+  background-color: #666;
+  border: 1px solid #555;
 }
 .cell {
   width: 15px;
   height: 15px;
-  background-color: white;
-  border: 1px solid #eee;
+  background-color: #888;
+  border: 1px solid #777;
   position: relative;
   overflow: hidden;
 }
 
+body.light-mode #main {
+  background-color: white;
+}
 body.light-mode #sidebar {
   background-color: #ecf0f1;
   color: black;
@@ -82,11 +86,12 @@ body.light-mode #sidebar button.active {
   background-color: #3498db;
 }
 body.light-mode #grid {
-  background-color: #ccc;
+  background-color: #ddd;
+  border: 1px solid #ccc;
 }
 body.light-mode .cell {
   background-color: white;
-  border: 1px solid #ccc;
+  border: 1px solid #eee;
 }
 
 .cell > div {
