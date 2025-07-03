@@ -10,7 +10,7 @@ TODO:
 ----------------------------------
 */
 // GRID SIZE:
-const ROWS = 50, COLS = 50;
+let ROWS = 50, COLS = 50;
 
 
 let grid = [], start = null, end = null, mode = 'nothing';
@@ -257,6 +257,18 @@ function clearPath() {
         }
     }
     weightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-mode');
+    const toggle = document.getElementById('themeToggle');
+    toggle.style.transform = 'translateX(-20px)';
+    toggle.style.opacity = 0;
+    setTimeout(() => {
+        toggle.textContent = isLight ? '☀️' : '🌙';
+        toggle.style.transform = 'translateX(0)';
+        toggle.style.opacity = 1;
+    }, 150);
 }
 
 createGrid();

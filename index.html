@@ -19,6 +19,10 @@
 
     <body>
         <div id="sidebar">
+            <span id="themeToggle" onclick="toggleTheme()" style="cursor: pointer; 
+            font-size: 18px; align-self: flex-end; transition: transform 0.3s ease, 
+            opacity 0.3s ease, left 0.3s ease, top 0.3s ease; position: relative;">🌙</span>
+
             <label>Rows: <input type='number' id='rowsInput' value='50' min='5' style='width: 60px;' onchange='updateRows()'></label>
             <label>Cols: <input type='number' id='colsInput' value='50' min='5' style='width: 60px;' onchange='updateCols()'></label>
 

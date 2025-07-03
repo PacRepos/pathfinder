@@ -65,6 +65,30 @@ body {
   position: relative;
   overflow: hidden;
 }
+
+body.light-mode #sidebar {
+  background-color: #ecf0f1;
+  color: black;
+}
+body.light-mode #sidebar button,
+body.light-mode #sidebar label {
+  background-color: #bdc3c7;
+  color: black;
+}
+body.light-mode #sidebar button:hover {
+  background-color: #aab7b8;
+}
+body.light-mode #sidebar button.active {
+  background-color: #3498db;
+}
+body.light-mode #grid {
+  background-color: #ccc;
+}
+body.light-mode .cell {
+  background-color: white;
+  border: 1px solid #ccc;
+}
+
 .cell > div {
   display: none;
 }
