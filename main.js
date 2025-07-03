@@ -60,22 +60,18 @@ function createGrid() {
     }
 }
 
-function updateRows() {
-    const input = document.getElementById('rowsInput');
-    if (!input.value || isNaN(input.value) || input.value < 5 || input.value > 100) {
-        alert("The minimum number of rows is 5 and the maximum is 100.");
+function resizeGrid() {
+    const rowInput = document.getElementById('rowsInput');
+    const colInput = document.getElementById('colsInput');
+    if (!rowInput || !colInput || isNaN(rowInput.value) || isNaN(colInput.value) || rowInput.value < 5 || colInput.value < 5 || rowInput.value > 100 || colInput.value > 100) {
+        alert("Invalid input. Please enter values between 5 and 100.");
+        return;
     }
-    ROWS = Math.max(5, Math.min(100, parseInt(input.value)));
-    resetGrid();
-}
-
-function updateCols() {
-    const input = document.getElementById('colsInput');
-    if (!input.value || isNaN(input.value) || input.value < 5 || input.value > 100) {
-        alert("The minimum number of columns is 5 and the maximum is 100.");
-    }
-    COLS = Math.max(5, Math.min(100, parseInt(input.value)));
-    resetGrid();
+    ROWS = Math.max(5, Math.min(100, parseInt(rowInput.value)));
+    COLS = Math.max(5, Math.min(100, parseInt(colInput.value)));
+    gridEl.style.gridTemplateColumns = `repeat(${COLS}, 15px)`;
+    gridEl.style.gridTemplateRows = `repeat(${ROWS}, 15px)`;
+    createGrid();
 }
 
 function setMode(m) {
