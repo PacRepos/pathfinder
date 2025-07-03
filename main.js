@@ -13,7 +13,7 @@ TODO:
 const ROWS = 50, COLS = 50;
 
 
-let grid = [], start = null, end = null, mode = 'start';
+let grid = [], start = null, end = null, mode = 'nothing';
 let mouseDown = false;
 let customWeight = 2;
 
@@ -48,7 +48,7 @@ function createGrid() {
             });
 
             cell.element.style.position = 'relative';
-
+            cell.label.style.cssText = 'position:absolute;width:100%;height:100%;font-size:10px;text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
             cell.label.innerHTML = cell.weight;
             cell.element.appendChild(cell.label);
 
@@ -61,6 +61,18 @@ function createGrid() {
 
 function setMode(m) {
     mode = m;
+    document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
+    const buttonMap = {
+        'start': 'Set Start',
+        'end': 'Set End',
+        'wall': 'Add Wall',
+        'weight': 'Add Weight'
+    };
+    const label = buttonMap[m];
+    if (label) {
+        const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.textContent.trim() === label);
+        if (btn) btn.classList.add('active');
+    }
 }
 
 function updateWeight() {
