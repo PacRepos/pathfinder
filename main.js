@@ -4,10 +4,8 @@ Pathfinder Visualizer
 1.4.1
 
 TODO:
-    - Paragraphical messages for no path found, start/end not set, etc.
     - better ui
     - add more algorithms (Dijkstra, etc.)
-    - add weights to cells (click to set weight)
 
 ----------------------------------
 */
@@ -49,8 +47,6 @@ function createGrid() {
                 if (mouseDown && mode === 'wall') handleClick(cell); // add/remove wall on mouse drag
             });
 
-            cell.label.style.cssText = 'position:absolute;width:100%;height:100%;font-size:10px;text-align:center;line-height:15px;color:black;pointer-events:none;display:none;';
-
             cell.element.style.position = 'relative';
 
             cell.label.innerHTML = cell.weight;
@@ -69,6 +65,11 @@ function setMode(m) {
 
 function updateWeight() {
     const input = document.getElementById('weightInput');
+    if (!input.value || isNaN(input.value) || input.value < 1) {
+        alert("The minimum weight is 1.");
+    } else if (input.value > 9) {
+        alert("Visibility may have issues with weights above 9 - the algorithm will still work, but the display may not be ideal.");
+    }
     customWeight = Math.max(1, parseInt(input.value));
 }
 
@@ -89,7 +90,7 @@ function handleClick(cell) {
     } else if (mode === 'weight') {
         if (!cell.isWall && cell !== start && cell !== end) {
             cell.weight = customWeight;
-            cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
+            cell.element.style.backgroundColor = `rgba(255, 135, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
             cell.label.innerHTML = customWeight;
 
             cell.label.style.display = 'block';
@@ -198,18 +199,6 @@ async function startAStar() {
     alert("No path found.");
 }
 
-
-function toggleWeightLabels() {
-    const show = document.getElementById('showWeightsToggle').checked;
-    for (let row of grid) {
-        for (let cell of row) {
-            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
-                cell.label.innerHTML = cell.weight;
-            }
-        }
-    }
-}
-
 function resetGrid() {
     createGrid();
     start = null;
@@ -225,7 +214,7 @@ function clearPath() {
             }
         }
     }
-    weightDisplay.innerHTML = '';
+    weightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
 }
 
 createGrid();

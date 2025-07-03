@@ -63,6 +63,17 @@ body {
 .cell > div {
   display: none;
 }
+.cell > div.label {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  font-size: 10px;
+  text-align:center;
+  line-height:15px;
+  color:black;
+  pointer-events:none;
+  display:none;
+}
 
 .cell.start { background-color: green !important; }
 .cell.end { background-color: red !important; }
