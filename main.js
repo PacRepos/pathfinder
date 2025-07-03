@@ -102,10 +102,16 @@ function handleClick(cell) {
     } else if (mode === 'weight') {
         if (!cell.isWall && cell !== start && cell !== end) {
             cell.weight = customWeight;
-            cell.element.style.backgroundColor = `rgba(255, 135, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
-            cell.label.innerHTML = customWeight;
+            if (customWeight === 1) {
+                cell.element.style.backgroundColor = 'white';
+                cell.label.innerHTML = '';
+                cell.label.style.display = 'none';
+            } else {
+                cell.element.style.backgroundColor = `rgba(255, 135, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
+                cell.label.innerHTML = customWeight;
 
-            cell.label.style.display = 'block';
+                cell.label.style.display = 'block';
+            }
         }
     }
 }
