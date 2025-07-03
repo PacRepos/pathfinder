@@ -6,7 +6,6 @@
 
 body {
   display: flex;
-  min-height: 100%;
   margin: 0;
 }
 #sidebar {
@@ -19,6 +18,7 @@ body {
   flex-direction: column;
   gap: 10px;
   overflow-y: auto;
+  overflow-x: auto;
 }
 #sidebar button, #sidebar label {
   background-color: #34495e;
