@@ -13,7 +13,7 @@ TODO:
 const ROWS = 50, COLS = 50;
 
 
-let grid = [], start = null, end = null, mode = 'wall';
+let grid = [], start = null, end = null, mode = 'start';
 let mouseDown = false;
 let customWeight = 2;
 
