@@ -93,11 +93,6 @@ function handleClick(cell) {
             cell.label.innerHTML = customWeight;
 
             cell.label.style.display = 'block';
-            /*
-            if (document.getElementById('showWeightsToggle').checked) {
-                cell.label.style.display = 'block';
-            }
-                */
         }
     }
 }
@@ -203,16 +198,17 @@ async function startAStar() {
     alert("No path found.");
 }
 
-/*
+
 function toggleWeightLabels() {
     const show = document.getElementById('showWeightsToggle').checked;
     for (let row of grid) {
         for (let cell of row) {
-            cell.label.style.display = show ? 'block' : 'none';
+            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
+                cell.label.innerHTML = cell.weight;
+            }
         }
     }
 }
-    */
 
 function resetGrid() {
     createGrid();
@@ -226,7 +222,6 @@ function clearPath() {
             cell.element.classList.remove('path', 'visited');
             if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
                 cell.element.style.backgroundColor = 'white';
-                cell.label.style.display = 'none';
             }
         }
     }

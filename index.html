@@ -26,15 +26,13 @@
             
             <button onclick='setMode("weight")'>Add Weight</button>
             <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' style='width: 60px;' onchange='updateWeight()'></label>
-            
+            <label><input type='checkbox' id='showWeightsToggle' onchange='toggleWeightLabels()'> Show All Weights</label>
+
             <button onclick='startAStar()'>Start A*</button>
             <button onclick='clearPath()'>Clear A*</button>
 
             <button onclick='resetGrid()'>Reset</button>
             <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
-            <!--
-            <label><input type='checkbox' id='showWeightsToggle' onchange='toggleWeightLabels()'> Show Weights</label>
-            -->
         </div>
 
         <div id="main">
