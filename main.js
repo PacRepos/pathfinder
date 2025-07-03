@@ -17,7 +17,7 @@ const ROWS = 50, COLS = 50;
 
 let grid = [], start = null, end = null, mode = 'wall';
 let mouseDown = false;
-let customWeight = 1;
+let customWeight = 2;
 
 const gridEl = document.getElementById('grid');
 const weightDisplay = document.getElementById('weightDisplay');
@@ -89,7 +89,7 @@ function handleClick(cell) {
     } else if (mode === 'weight') {
         if (!cell.isWall && cell !== start && cell !== end) {
             cell.weight = customWeight;
-            // cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
+            cell.element.style.backgroundColor = `rgba(255, 165, 0, ${Math.min(0.9, 0.1 + 0.1 * customWeight)})`;
             cell.label.innerHTML = customWeight;
 
             cell.label.style.display = 'block';
@@ -208,9 +208,7 @@ function toggleWeightLabels() {
     const show = document.getElementById('showWeightsToggle').checked;
     for (let row of grid) {
         for (let cell of row) {
-            if (cell.weight > 1) {
-                cell.label.style.display = show ? 'block' : 'none';
-            }
+            cell.label.style.display = show ? 'block' : 'none';
         }
     }
 }
@@ -227,8 +225,8 @@ function clearPath() {
         for (let cell of row) {
             cell.element.classList.remove('path', 'visited');
             if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
-                // cell.element.style.backgroundColor = 'white';
-                // cell.label.style.display = 'none';
+                cell.element.style.backgroundColor = 'white';
+                cell.label.style.display = 'none';
             }
         }
     }
