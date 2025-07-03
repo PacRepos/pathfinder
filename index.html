@@ -19,11 +19,14 @@
 
     <body>
         <div id="sidebar">
+            <label>Rows: <input type='number' id='rowsInput' value='50' min='5' style='width: 60px;' onchange='updateRows()'></label>
+            <label>Cols: <input type='number' id='colsInput' value='50' min='5' style='width: 60px;' onchange='updateCols()'></label>
+
             <button onclick='setMode("start")'>Set Start</button>
             <button onclick='setMode("end")'>Set End</button>
             <button onclick='setMode("wall")'>Add Wall</button>
             
-            <button onclick='setMode("weight")'>Add Weight</button>
+            <button onclick='setMode("weight")'>Change Weight</button>
             <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' style='width: 60px;' onchange='updateWeight()'></label>
 
             <button onclick='startAStar()'>Start A*</button>

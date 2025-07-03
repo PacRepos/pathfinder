@@ -16,6 +16,7 @@ const ROWS = 50, COLS = 50;
 let grid = [], start = null, end = null, mode = 'nothing';
 let mouseDown = false;
 let customWeight = 2;
+// customWeight has to be equal to the default label box value since label box does not update until first input
 
 const gridEl = document.getElementById('grid');
 const weightDisplay = document.getElementById('weightDisplay');
@@ -59,6 +60,24 @@ function createGrid() {
     }
 }
 
+function updateRows() {
+    const input = document.getElementById('rowsInput');
+    if (!input.value || isNaN(input.value) || input.value < 5 || input.value > 100) {
+        alert("The minimum number of rows is 5 and the maximum is 100.");
+    }
+    ROWS = Math.max(5, Math.min(100, parseInt(input.value)));
+    resetGrid();
+}
+
+function updateCols() {
+    const input = document.getElementById('colsInput');
+    if (!input.value || isNaN(input.value) || input.value < 5 || input.value > 100) {
+        alert("The minimum number of columns is 5 and the maximum is 100.");
+    }
+    COLS = Math.max(5, Math.min(100, parseInt(input.value)));
+    resetGrid();
+}
+
 function setMode(m) {
     mode = m;
     document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
@@ -66,7 +85,7 @@ function setMode(m) {
         'start': 'Set Start',
         'end': 'Set End',
         'wall': 'Add Wall',
-        'weight': 'Add Weight'
+        'weight': 'Change Weight'
     };
     const label = buttonMap[m];
     if (label) { // search by label; probably not the best way but works
@@ -86,6 +105,11 @@ function updateWeight() {
 }
 
 function handleClick(cell) {
+    if (mode !== 'weight') { // reset cell if not in weight mode to clear text and color
+        cell.element.style.backgroundColor = 'white';
+        cell.label.innerHTML = '';
+        cell.label.style.display = 'none';
+    }
     if (mode === 'start') {
         if (start) start.element.classList.remove('start'); // handling if start already exists
         start = cell;
@@ -95,7 +119,7 @@ function handleClick(cell) {
         end = cell;
         cell.element.classList.add('end');
     } else if (mode === 'wall') {
-        if (cell !== start && cell !== end) { // toggle wall state
+        if (cell !== start && cell !== end) {
             cell.isWall = !cell.isWall;
             cell.element.classList.toggle('wall');
         }
@@ -156,7 +180,7 @@ function getNeighbors(cell) {
 }
 
 async function startAStar() {
-    clearPath(); // clear previous path
+    clearPath();
     if (!start || !end) return alert("Set both start and end points.");
 
     let openSet = [start];
