@@ -115,22 +115,12 @@ function handleClick(cell) {
     if (mode === 'start') {
         if (start) {
             start.element.classList.remove('start');
-            if (isLight) {
-                cell.element.style.backgroundColor = 'white';
-            } else {
-                cell.element.style.backgroundColor = '#888';
-            }
         }
         start = cell;
         cell.element.classList.add('start');
     } else if (mode === 'end') {
         if (end) {
             end.element.classList.remove('end');
-            if (isLight) {
-                end.element.style.backgroundColor = 'white';
-            } else {
-                end.element.style.backgroundColor = '#888';
-            }
         }
         end = cell;
         cell.element.classList.add('end');
@@ -158,6 +148,7 @@ function handleClick(cell) {
             }
         }
     }
+    clearColoring();
 }
 
 function distance(a, b) {
@@ -271,20 +262,26 @@ function clearPath() {
     for (let row of grid) {
         for (let cell of row) {
             cell.element.classList.remove('path', 'visited');
-            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
-                if (isLight) {
-                    cell.element.style.backgroundColor = 'white';
-                } else {
-                    cell.element.style.backgroundColor = '#888';
-                }
-            }
         }
     }
+    clearColoring();
     weightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
 }
 
 function toggleTheme() {
     isLight = document.body.classList.toggle('light-mode');
+    clearColoring();
+    const toggle = document.getElementById('themeToggle');
+    toggle.style.transform = 'translateX(-20px)';
+    toggle.style.opacity = 0;
+    setTimeout(() => {
+        toggle.textContent = isLight ? '☀️' : '🌙';
+        toggle.style.transform = 'translateX(0)';
+        toggle.style.opacity = 1;
+    }, 150);
+}
+
+function clearColoring() {
     for (let row of grid) {
         for (let cell of row) {
             if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
@@ -296,14 +293,6 @@ function toggleTheme() {
             }
         }
     }
-    const toggle = document.getElementById('themeToggle');
-    toggle.style.transform = 'translateX(-20px)';
-    toggle.style.opacity = 0;
-    setTimeout(() => {
-        toggle.textContent = isLight ? '☀️' : '🌙';
-        toggle.style.transform = 'translateX(0)';
-        toggle.style.opacity = 1;
-    }, 150);
 }
 
 createGrid();
