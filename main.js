@@ -113,11 +113,25 @@ function handleClick(cell) {
         cell.label.style.display = 'none';
     }
     if (mode === 'start') {
-        if (start) start.element.classList.remove('start'); // handling if start already exists
+        if (start) {
+            start.element.classList.remove('start');
+            if (isLight) {
+                cell.element.style.backgroundColor = 'white';
+            } else {
+                cell.element.style.backgroundColor = '#888';
+            }
+        }
         start = cell;
         cell.element.classList.add('start');
     } else if (mode === 'end') {
-        if (end) end.element.classList.remove('end'); // handling if end already exists
+        if (end) {
+            end.element.classList.remove('end');
+            if (isLight) {
+                end.element.style.backgroundColor = 'white';
+            } else {
+                end.element.style.backgroundColor = '#888';
+            }
+        }
         end = cell;
         cell.element.classList.add('end');
     } else if (mode === 'wall') {
