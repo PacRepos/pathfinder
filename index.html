@@ -18,34 +18,36 @@
     </head>
 
     <body>
-        <div id="sidebar">
-            <span id="themeToggle" onclick="toggleTheme()" style="cursor: pointer; 
-            font-size: 18px; align-self: flex-end; transition: transform 0.3s ease, 
-            opacity 0.3s ease, left 0.3s ease, top 0.3s ease; position: relative;">🌙</span>
+        <div id="app">
+            <div id="sidebar">
+                <span id="themeToggle" onclick="toggleTheme()" style="cursor: pointer; 
+                font-size: 18px; align-self: flex-end; transition: transform 0.3s ease, 
+                opacity 0.3s ease, left 0.3s ease, top 0.3s ease; position: relative;">🌙</span>
 
-            <label>Rows: <input type='number' id='rowsInput' value='50' min='5' style='width: 60px;' onchange='resizeGrid()'></label>
-            <label>Cols: <input type='number' id='colsInput' value='50' min='5' style='width: 60px;' onchange='resizeGrid()'></label>
+                <label>Rows: <input type='number' id='rowsInput' value='50' min='5' style='width: 60px;' onchange='resizeGrid()'></label>
+                <label>Cols: <input type='number' id='colsInput' value='50' min='5' style='width: 60px;' onchange='resizeGrid()'></label>
 
-            <button onclick='setMode("start")'>Set Start</button>
-            <button onclick='setMode("end")'>Set End</button>
-            <button onclick='setMode("wall")'>Add Wall</button>
+                <button onclick='setMode("start")'>Set Start</button>
+                <button onclick='setMode("end")'>Set End</button>
+                <button onclick='setMode("wall")'>Add Wall</button>
+                
+                <button onclick='setMode("weight")'>Change Weight</button>
+                <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' style='width: 60px;' onchange='updateWeight()'></label>
+
+                <button onclick='startAStar()'>Start A*</button>
+                <button onclick='clearPath()'>Clear A*</button>
+
+                <button onclick='resetGrid()'>Reset</button>
+                <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
+            </div>
+
+            <div id="main">
+                <div id='weightDisplay'></div>
+                <div id='grid'></div>
+            </div>
             
-            <button onclick='setMode("weight")'>Change Weight</button>
-            <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' style='width: 60px;' onchange='updateWeight()'></label>
-
-            <button onclick='startAStar()'>Start A*</button>
-            <button onclick='clearPath()'>Clear A*</button>
-
-            <button onclick='resetGrid()'>Reset</button>
-            <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
+            <script src="main.js"></script>
         </div>
-
-        <div id="main">
-            <div id='weightDisplay'></div>
-            <div id='grid'></div>
-        </div>
-        
-        <script src="main.js"></script>
 
         <footer>
             <p>&copy; 2025 pacrepos (under MIT license)</p>

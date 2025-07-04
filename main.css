@@ -4,10 +4,14 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
 body {
   display: flex;
-  height: 100vh;
-  margin: 0;
+  flex-direction: column;
+  min-height: 100%;
 }
 #sidebar {
   width: 20vw;
@@ -104,6 +108,11 @@ body.light-mode .cell {
 body.light-mode footer{
   background-color: white;
   color: black;
+}
+
+#app {
+  display: flex;
+  flex: 1;
 }
 
 .cell > div {
