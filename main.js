@@ -16,8 +16,9 @@ let ROWS = 50, COLS = 50;
 let grid = [], start = null, end = null, mode = 'nothing';
 let mouseDown = false;
 let customWeight = 2;
-let isLight = document.body.classList.toggle('light-mode');
 // customWeight has to be equal to the default label box value since label box does not update until first input
+
+let isLight = document.body.classList.toggle('light-mode');
 
 const gridEl = document.getElementById('grid');
 const weightDisplay = document.getElementById('weightDisplay');
@@ -270,6 +271,17 @@ function clearPath() {
 
 function toggleTheme() {
     isLight = document.body.classList.toggle('light-mode');
+    for (let row of grid) {
+        for (let cell of row) {
+            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
+                if (isLight) {
+                    cell.element.style.backgroundColor = 'white';
+                } else {
+                    cell.element.style.backgroundColor = '#888';
+                }
+            }
+        }
+    }
     const toggle = document.getElementById('themeToggle');
     toggle.style.transform = 'translateX(-20px)';
     toggle.style.opacity = 0;
