@@ -82,7 +82,7 @@ function setMode(m) {
     const buttonMap = {
         'start': 'Set Start',
         'end': 'Set End',
-        'wall': 'Add Wall',
+        'wall': 'Add/Remove Wall',
         'weight': 'Change Weight'
     };
     const label = buttonMap[m];
