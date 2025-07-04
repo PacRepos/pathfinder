@@ -16,6 +16,7 @@ let ROWS = 50, COLS = 50;
 let grid = [], start = null, end = null, mode = 'nothing';
 let mouseDown = false;
 let customWeight = 2;
+let isLight = document.body.classList.toggle('light-mode');
 // customWeight has to be equal to the default label box value since label box does not update until first input
 
 const gridEl = document.getElementById('grid');
@@ -102,7 +103,11 @@ function updateWeight() {
 
 function handleClick(cell) {
     if (mode !== 'weight') { // reset cell if not in weight mode to clear text and color
-        cell.element.style.backgroundColor = 'white';
+        if (isLight) {
+            cell.element.style.backgroundColor = 'white';
+        } else {
+            cell.element.style.backgroundColor = '#888';
+        }
         cell.label.innerHTML = '';
         cell.label.style.display = 'none';
     }
@@ -123,7 +128,11 @@ function handleClick(cell) {
         if (!cell.isWall && cell !== start && cell !== end) {
             cell.weight = customWeight;
             if (customWeight === 1) {
-                cell.element.style.backgroundColor = 'white';
+                if (isLight) {
+                    cell.element.style.backgroundColor = 'white';
+                } else {
+                    cell.element.style.backgroundColor = '#888';
+                }
                 cell.label.innerHTML = '';
                 cell.label.style.display = 'none';
             } else {
@@ -248,7 +257,11 @@ function clearPath() {
         for (let cell of row) {
             cell.element.classList.remove('path', 'visited');
             if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
-                cell.element.style.backgroundColor = 'white';
+                if (isLight) {
+                    cell.element.style.backgroundColor = 'white';
+                } else {
+                    cell.element.style.backgroundColor = '#888';
+                }
             }
         }
     }
@@ -256,7 +269,7 @@ function clearPath() {
 }
 
 function toggleTheme() {
-    const isLight = document.body.classList.toggle('light-mode');
+    isLight = document.body.classList.toggle('light-mode');
     const toggle = document.getElementById('themeToggle');
     toggle.style.transform = 'translateX(-20px)';
     toggle.style.opacity = 0;
