@@ -58,6 +58,9 @@ body {
   background-color: #666;
   border: 1px solid #555;
 }
+#footer {
+  background-color: #888;
+}
 .cell {
   width: 15px;
   height: 15px;
@@ -92,6 +95,9 @@ body.light-mode #grid {
 body.light-mode .cell {
   background-color: white;
   border: 1px solid #eee;
+}
+footer.light-mode {
+  background-color: white;
 }
 
 .cell > div {
