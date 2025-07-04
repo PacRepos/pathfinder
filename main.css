@@ -18,6 +18,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
 }
 #sidebar button, #sidebar label {
   background-color: #34495e;
@@ -58,7 +59,11 @@ body {
   background-color: #666;
   border: 1px solid #555;
 }
-#footer {
+footer {
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: white;
   background-color: #888;
 }
 .cell {
@@ -96,8 +101,9 @@ body.light-mode .cell {
   background-color: white;
   border: 1px solid #eee;
 }
-footer.light-mode {
+body.light-mode footer{
   background-color: white;
+  color: black;
 }
 
 .cell > div {
