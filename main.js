@@ -1,11 +1,15 @@
 /* 
 ----------------------------------
 Pathfinder Visualizer
-1.4.1
-
-TODO:
-    - better ui
-    - add more algorithms (Dijkstra, etc.)
+2.0.0
+    - As of now finished everything I wanted to do with the grid mode
+    - Working on open mode
+    - Expect:
+        - Infinitely scrolling grid (zoom in/out)
+        - Points vs cells
+        - Walls that take up a zone vs a cell
+        - Weights that take up a zone vs a cell
+        - Greedy smoothing/String pulling for pathfinding
 
 ----------------------------------
 */
@@ -13,16 +17,14 @@ TODO:
 let ROWS = 50, COLS = 50;
 
 
-let grid = [], start = null, end = null, mode = 'nothing';
-let mouseDown = false;
+let grid = [], start = null, end = null, mouseDown = false, mode = 'nothing', isLight = document.body.classList.toggle('light-mode'); // force refresh light mode
 let customWeight = 2;
 // customWeight has to be equal to the default label box value since label box does not update until first input
-
-let isLight = document.body.classList.toggle('light-mode');
 
 const gridEl = document.getElementById('grid');
 const weightDisplay = document.getElementById('weightDisplay');
 const diagonalToggle = document.getElementById('diagonalToggle');
+const animationToggle = document.getElementById('animationToggle');
 
 document.body.addEventListener('mousedown', () => mouseDown = true);
 document.body.addEventListener('mouseup', () => mouseDown = false);
@@ -221,7 +223,9 @@ async function startAStar() {
             for (let cell of path) { // highlight the path
                 if (cell !== start && cell !== end) {
                     cell.element.classList.add('path');
-                    await new Promise(r => setTimeout(r, 10));
+                    if (animationToggle.checked) {
+                        await new Promise(r => setTimeout(r, 10));
+                    }
                 }
             }
             weightDisplay.innerHTML = `Total Path Weight: ${current.g.toFixed(2)}`;
@@ -247,7 +251,9 @@ async function startAStar() {
                 if (!openSet.includes(neighbor)) openSet.push(neighbor); // add to open set
             }
         }
-        await new Promise(r => setTimeout(r, 5)); // visualize pause (change as needed)
+        if (animationToggle.checked) {
+            await new Promise(r => setTimeout(r, 5));
+        }
     }
     alert("No path found.");
 }
@@ -292,6 +298,18 @@ function clearColoring() {
                 }
             }
         }
+    }
+}
+
+function toggleMode() {
+    const isGridMode = document.getElementById('modeSwitch').innerHTML.includes('open');
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('main');
+    if (isGridMode) {
+        sidebar.innerHTML = '<button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>';
+        main.innerHTML = '';
+    } else {
+        location.reload(); // Reload for grid mode
     }
 }
 

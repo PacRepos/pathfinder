@@ -20,6 +20,7 @@
     <body>
         <div id="app">
             <div id="sidebar">
+                <button id="modeSwitch" onclick="toggleMode()" style="font-size: 10px; padding: 6px 8px; align-self: flex-start;">Switch to open mode</button>
                 <span id="themeToggle" onclick="toggleTheme()" style="cursor: pointer; 
                 font-size: 18px; align-self: flex-end; transition: transform 0.3s ease, 
                 opacity 0.3s ease, left 0.3s ease, top 0.3s ease; position: relative;">☀️</span>
@@ -39,6 +40,7 @@
 
                 <button onclick='resetGrid()'>Reset</button>
                 <label><input type='checkbox' id='diagonalToggle' checked> Allow Diagonal Movement</label>
+                <label><input type='checkbox' id='animationToggle' checked> Show Pathfinding Animation</label>
             </div>
 
             <div id="main">
