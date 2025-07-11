@@ -335,7 +335,7 @@ function toggleMode() {
         `;
         main.innerHTML = 
         `
-            <canvas id="openMap" width="60vw" height="80vh"></canvas>
+            <canvas id="openMap" width="800" height="600"></canvas>
         `;
         initOpen();
     } else {
