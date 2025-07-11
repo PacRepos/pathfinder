@@ -19,7 +19,7 @@ Pathfinder Visualizer
 -------- GRID MODE --------
 */
 
-
+import React, { useRef, useState, useEffect } from "react";
 
 
 // GRID SIZE:
@@ -95,7 +95,7 @@ function setMode(m) {
         'weight': 'Change Weight'
     };
     const label = buttonMap[m];
-    if (label) { // search by label; probably not the best way but works
+    if (label) {
         const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.innerHTML.trim() === label);
         if (btn) btn.classList.add('active');
     }
@@ -309,7 +309,7 @@ function clearColoring() {
             }
         }
     } else {
-        drawGrid();
+        
     }
 }
 
@@ -322,79 +322,145 @@ function clearColoring() {
 
 /* Some cleanup here for the toggling */
 
+
+let placingMode = null;
+let baseSpacing = 40;
+let offsetX = 0, offsetY = 0, zoomLevel = 1;
+let drag = false, startX, startY;
+let startPoint = null;
+let endPoint = null;
+
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
     const sidebar = document.getElementById('sidebar');
     const main = document.getElementById('main');
     if (isOpenMode) {
-        if (isLight) toggleTheme();
         sidebar.innerHTML = `
             <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
-        
+            <button onclick='setOpenMode("start")'>Set Start</button>
+            <button onclick='setOpenMode("end")'>Set End</button>
         `;
-        main.innerHTML = 
-        `
+        main.innerHTML = `
+            <div id='weightDisplay'></div>
             <canvas id="openMap" width="800" height="600"></canvas>
         `;
         initOpen();
+        if (isLight) toggleTheme();
     } else {
         location.reload(); // Reload for grid mode
     }
 }
 
-function drawGrid() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const spacing = baseSpacing * zoomLevel;
-    const cols = Math.ceil(canvas.width / spacing) + 2;
-    const rows = Math.ceil(canvas.height / spacing) + 2;
-    const originX = -offsetX % spacing;
-    const originY = -offsetY % spacing;
-
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            const cx = x * spacing + originX;
-            const cy = y * spacing + originY;
-            ctx.beginPath();
-            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-            ctx.strokeStyle = isLight ? '#333' : '#fff'; // try #000 for darkmode
-            ctx.stroke();
-        }
+function setOpenMode(m) {
+    placingMode = m;
+    document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
+    const buttonMap = {
+        'start': 'Set Start',
+        'end': 'Set End',
+    };
+    const label = buttonMap[m];
+    if (label) {
+        const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.innerHTML.trim() === label);
+        if (btn) btn.classList.add('active');
     }
 }
 
 function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
-    let baseSpacing = 40;
-    let offsetX = 0, offsetY = 0, zoomLevel = 1;
-    let drag = false, startX, startY;
+    const sidebar = document.getElementById('sidebar');
+
+    function worldToScreen(x, y) {
+        return {
+            x: x * baseSpacing * zoomLevel + offsetX,
+            y: y * baseSpacing * zoomLevel + offsetY
+        };
+    }
+
+    function screenToWorld(x, y) {
+        return {
+            x: (x - offsetX) / (baseSpacing * zoomLevel),
+            y: (y - offsetY) / (baseSpacing * zoomLevel)
+        };
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw start and end points
+        if (startPoint) {
+            const { x, y } = worldToScreen(startPoint.x, startPoint.y);
+            ctx.fillStyle = 'green';
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        if (endPoint) {
+            const { x, y } = worldToScreen(endPoint.x, endPoint.y);
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Draw shortest path line (straight for now)
+        if (startPoint && endPoint) {
+            const s = worldToScreen(startPoint.x, startPoint.y);
+            const e = worldToScreen(endPoint.x, endPoint.y);
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(s.x, s.y);
+            ctx.lineTo(e.x, e.y);
+            ctx.stroke();
+        }
+    }
 
     canvas.addEventListener('mousedown', e => {
         drag = true;
         startX = e.clientX;
         startY = e.clientY;
     });
+
     canvas.addEventListener('mousemove', e => {
         if (drag) {
-            offsetX -= e.clientX - startX;
-            offsetY -= e.clientY - startY;
+            offsetX += e.clientX - startX;
+            offsetY += e.clientY - startY;
             startX = e.clientX;
             startY = e.clientY;
-            drawGrid();
+            draw();
         }
     });
+
     canvas.addEventListener('mouseup', () => drag = false);
     canvas.addEventListener('mouseleave', () => drag = false);
+
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1; // try flipping
-        zoomLevel = Math.max(0.1, Math.min(1.3, zoomLevel + delta));
-        drawGrid();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        zoomLevel = Math.max(0.1, Math.min(2.0, zoomLevel + delta));
+        draw();
     });
 
-    drawGrid();
+    canvas.addEventListener('click', e => {
+        if (!placingMode) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const gridPos = screenToWorld(mouseX, mouseY);
+
+        if (placingMode === 'start') startPoint = gridPos;
+        else if (placingMode === 'end') endPoint = gridPos;
+
+        placingMode = null;
+        draw();
+    });
+
+    draw();
 }
+
 
 
 
