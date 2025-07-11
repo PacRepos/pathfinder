@@ -20,20 +20,18 @@
     <body>
         <div id="app">
             <div id="sidebar">
-                <button id="modeSwitch" onclick="toggleMode()" style="font-size: 10px; padding: 6px 8px; align-self: flex-start;">Switch to open mode</button>
-                <span id="themeToggle" onclick="toggleTheme()" style="cursor: pointer; 
-                font-size: 18px; align-self: flex-end; transition: transform 0.3s ease, 
-                opacity 0.3s ease, left 0.3s ease, top 0.3s ease; position: relative;">☀️</span>
+                <button id="modeSwitch" onclick="toggleMode()">Switch to open mode</button>
+                <span id="themeToggle" onclick="toggleTheme()">🌙</span>
 
-                <label>Rows: <input type='number' id='rowsInput' value='50' min='5' style='width: 60px;' onchange='resizeGrid()'></label>
-                <label>Cols: <input type='number' id='colsInput' value='50' min='5' style='width: 60px;' onchange='resizeGrid()'></label>
+                <label>Rows: <input type='number' id='rowsInput' value='50' min='5' onchange='resizeGrid()'></label>
+                <label>Cols: <input type='number' id='colsInput' value='50' min='5' onchange='resizeGrid()'></label>
 
                 <button onclick='setMode("start")'>Set Start</button>
                 <button onclick='setMode("end")'>Set End</button>
                 <button onclick='setMode("wall")'>Add/Remove Wall</button>
                 
                 <button onclick='setMode("weight")'>Change Weight</button>
-                <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' style='width: 60px;' onchange='updateWeight()'></label>
+                <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' onchange='updateWeight()'></label>
 
                 <button onclick='startAStar()'>Start Algorithm (A*)</button>
                 <button onclick='clearPath()'>Clear Pathfinding</button>

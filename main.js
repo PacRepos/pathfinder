@@ -13,11 +13,18 @@ Pathfinder Visualizer
 
 ----------------------------------
 */
+
+
+/*
+-------- GRID MODE --------
+*/
+
+
+
+
 // GRID SIZE:
 let ROWS = 50, COLS = 50;
-
-
-let grid = [], start = null, end = null, mouseDown = false, mode = 'nothing', isLight = document.body.classList.toggle('light-mode'); // force refresh light mode
+let grid = [], start = null, end = null, mouseDown = false, mode = 'nothing', isLight = false;
 let customWeight = 2;
 // customWeight has to be equal to the default label box value since label box does not update until first input
 
@@ -301,16 +308,94 @@ function clearColoring() {
     }
 }
 
+
+
+/*
+-------- OPEN MODE --------
+*/
+
+
+/* Some cleanup here for the toggling */
+
 function toggleMode() {
     const isGridMode = document.getElementById('modeSwitch').innerHTML.includes('open');
     const sidebar = document.getElementById('sidebar');
     const main = document.getElementById('main');
     if (isGridMode) {
-        sidebar.innerHTML = '<button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>';
-        main.innerHTML = '';
+        
+        sidebar.innerHTML = 
+        `
+            <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
+            <span id="themeToggle" onclick="toggleTheme()">🌙</span>
+        
+        `;
+        main.innerHTML = 
+        `
+            <canvas id="openMap" width="800" height="600"></canvas>
+        `;
+        initOpen();
     } else {
         location.reload(); // Reload for grid mode
     }
 }
 
+function initOpen() {
+    const canvas = document.getElementById('openMap');
+    const ctx = canvas.getContext('2d');
+    let baseSpacing = 40;
+    let offsetX = 0, offsetY = 0, zoomLevel = 1;
+    let drag = false, startX, startY;
+
+    function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const spacing = baseSpacing * zoomLevel;
+        const cols = Math.ceil(canvas.width / spacing) + 2;
+        const rows = Math.ceil(canvas.height / spacing) + 2;
+        const originX = -offsetX % spacing;
+        const originY = -offsetY % spacing;
+
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const cx = x * spacing + originX;
+                const cy = y * spacing + originY;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+                ctx.strokeStyle = isLight ? '#333' : '#fff'; // try #000 for darkmode
+                ctx.stroke();
+            }
+        }
+    }
+
+    canvas.addEventListener('mousedown', e => {
+        drag = true;
+        startX = e.clientX;
+        startY = e.clientY;
+    });
+    canvas.addEventListener('mousemove', e => {
+        if (drag) {
+            offsetX += e.clientX - startX;
+            offsetY += e.clientY - startY;
+            startX = e.clientX;
+            startY = e.clientY;
+            drawGrid();
+        }
+    });
+    canvas.addEventListener('mouseup', () => drag = false);
+    canvas.addEventListener('mouseleave', () => drag = false);
+    canvas.addEventListener('wheel', e => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1; // try flipping
+        zoomLevel = Math.max(0.2, Math.min(2.5, zoomLevel + delta));
+        drawGrid();
+    });
+
+    drawGrid();
+}
+
+
+
+
+/*
+----------- INITIALIZATION --------
+*/
 createGrid();

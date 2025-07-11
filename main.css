@@ -13,6 +13,7 @@ body {
   flex-direction: column;
   min-height: 100%;
 }
+
 #sidebar {
   width: 20vw;
   height: 100%;
@@ -24,6 +25,11 @@ body {
   gap: 10px;
   overflow-y: auto;
 }
+body.light-mode #sidebar {
+  background-color: #ecf0f1;
+  color: black;
+}
+
 #sidebar button, #sidebar label {
   background-color: #34495e;
   color: white;
@@ -35,12 +41,25 @@ body {
   text-align: center;
   transition: background-color 0.3s;
 }
+body.light-mode #sidebar button,
+body.light-mode #sidebar label {
+  background-color: #bdc3c7;
+  color: black;
+}
+
 #sidebar button:hover {
   background-color: #3e5871;
 }
 #sidebar button.active {
   background-color: #1abc9c;
 }
+body.light-mode #sidebar button:hover {
+  background-color: #aab7b8;
+}
+body.light-mode #sidebar button.active {
+  background-color: #3498db;
+}
+
 #main {
   background-color: #888;
   flex: 1;
@@ -50,11 +69,16 @@ body {
   justify-content: flex-start;
   padding: 20px;
 }
+body.light-mode #main {
+  background-color: white;
+}
+
 #weightDisplay {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
 }
+
 #grid {
   display: grid;
   grid-template-columns: repeat(50, 15px);
@@ -63,6 +87,11 @@ body {
   background-color: #666;
   border: 1px solid #555;
 }
+body.light-mode #grid {
+  background-color: #ddd;
+  border: 1px solid #ccc;
+}
+
 footer {
   width: 100%;
   padding: 10px;
@@ -70,6 +99,11 @@ footer {
   color: white;
   background-color: #888;
 }
+body.light-mode footer {
+  background-color: white;
+  color: black;
+}
+
 .cell {
   width: 15px;
   height: 15px;
@@ -78,36 +112,9 @@ footer {
   position: relative;
   overflow: hidden;
 }
-
-body.light-mode #main {
-  background-color: white;
-}
-body.light-mode #sidebar {
-  background-color: #ecf0f1;
-  color: black;
-}
-body.light-mode #sidebar button,
-body.light-mode #sidebar label {
-  background-color: #bdc3c7;
-  color: black;
-}
-body.light-mode #sidebar button:hover {
-  background-color: #aab7b8;
-}
-body.light-mode #sidebar button.active {
-  background-color: #3498db;
-}
-body.light-mode #grid {
-  background-color: #ddd;
-  border: 1px solid #ccc;
-}
 body.light-mode .cell {
   background-color: white;
   border: 1px solid #eee;
-}
-body.light-mode footer{
-  background-color: white;
-  color: black;
 }
 
 #app {
@@ -115,12 +122,48 @@ body.light-mode footer{
   flex: 1;
 }
 
+#modeSwitch {
+  font-size: 10px;
+  padding: 6px 8px;
+  align-self: flex-start;
+}
+
+#themeToggle {
+  cursor: pointer;
+  font-size: 18px;
+  align-self: flex-end;
+  transition: transform 0.3s ease, opacity 0.3s ease, left 0.3s ease, top 0.3s ease;
+  position: relative;
+}
+
+#rowsInput {
+  width: 60px;
+}
+
+#colsInput {
+  width: 60px;
+}
+
+#weightInput {
+  width: 60px;
+}
+
 .cell > div {
   display: none;
 }
-
 .cell.start { background-color: green !important; }
 .cell.end { background-color: red !important; }
 .cell.wall { background-color: black !important; }
 .cell.visited { background-color: lightblue !important; }
 .cell.path { background-color: yellow !important; }
+
+
+#openMap {
+  background-color: #666;
+  border: 1px solid #555;
+}
+body.light-mode #openMap {
+  background-color: #ddd;
+  border: 1px solid #ccc;
+}
+
