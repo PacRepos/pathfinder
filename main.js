@@ -295,16 +295,21 @@ function toggleTheme() {
 }
 
 function clearColoring() {
-    for (let row of grid) {
-        for (let cell of row) {
-            if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
-                if (isLight) {
-                    cell.element.style.backgroundColor = 'white';
-                } else {
-                    cell.element.style.backgroundColor = '#888';
+    const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
+    if (!isOpenMode) {
+        for (let row of grid) {
+            for (let cell of row) {
+                if (!cell.isWall && cell !== start && cell !== end && cell.weight === 1) {
+                    if (isLight) {
+                        cell.element.style.backgroundColor = 'white';
+                    } else {
+                        cell.element.style.backgroundColor = '#888';
+                    }
                 }
             }
         }
+    } else {
+        drawGrid();
     }
 }
 
@@ -318,24 +323,43 @@ function clearColoring() {
 /* Some cleanup here for the toggling */
 
 function toggleMode() {
-    const isGridMode = document.getElementById('modeSwitch').innerHTML.includes('open');
+    const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
     const sidebar = document.getElementById('sidebar');
     const main = document.getElementById('main');
-    if (isGridMode) {
-        
-        sidebar.innerHTML = 
-        `
+    if (isOpenMode) {
+        if (isLight) toggleTheme();
+        sidebar.innerHTML = `
             <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
         
         `;
         main.innerHTML = 
         `
-            <canvas id="openMap" width="800" height="600"></canvas>
+            <canvas id="openMap" width="60vw" height="80vh"></canvas>
         `;
         initOpen();
     } else {
         location.reload(); // Reload for grid mode
+    }
+}
+
+function drawGrid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const spacing = baseSpacing * zoomLevel;
+    const cols = Math.ceil(canvas.width / spacing) + 2;
+    const rows = Math.ceil(canvas.height / spacing) + 2;
+    const originX = -offsetX % spacing;
+    const originY = -offsetY % spacing;
+
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            const cx = x * spacing + originX;
+            const cy = y * spacing + originY;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+            ctx.strokeStyle = isLight ? '#333' : '#fff'; // try #000 for darkmode
+            ctx.stroke();
+        }
     }
 }
 
@@ -346,26 +370,6 @@ function initOpen() {
     let offsetX = 0, offsetY = 0, zoomLevel = 1;
     let drag = false, startX, startY;
 
-    function drawGrid() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const spacing = baseSpacing * zoomLevel;
-        const cols = Math.ceil(canvas.width / spacing) + 2;
-        const rows = Math.ceil(canvas.height / spacing) + 2;
-        const originX = -offsetX % spacing;
-        const originY = -offsetY % spacing;
-
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                const cx = x * spacing + originX;
-                const cy = y * spacing + originY;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-                ctx.strokeStyle = isLight ? '#333' : '#fff'; // try #000 for darkmode
-                ctx.stroke();
-            }
-        }
-    }
-
     canvas.addEventListener('mousedown', e => {
         drag = true;
         startX = e.clientX;
@@ -373,8 +377,8 @@ function initOpen() {
     });
     canvas.addEventListener('mousemove', e => {
         if (drag) {
-            offsetX += e.clientX - startX;
-            offsetY += e.clientY - startY;
+            offsetX -= e.clientX - startX;
+            offsetY -= e.clientY - startY;
             startX = e.clientX;
             startY = e.clientY;
             drawGrid();
@@ -385,7 +389,7 @@ function initOpen() {
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
         const delta = e.deltaY > 0 ? -0.1 : 0.1; // try flipping
-        zoomLevel = Math.max(0.2, Math.min(2.5, zoomLevel + delta));
+        zoomLevel = Math.max(0.1, Math.min(1.3, zoomLevel + delta));
         drawGrid();
     });
 
