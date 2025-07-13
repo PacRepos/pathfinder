@@ -95,7 +95,7 @@ function setMode(m) {
         'weight': 'Change Weight'
     };
     const label = buttonMap[m];
-    if (label) { // search by label; probably not the best way but works
+    if (label) {
         const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.innerHTML.trim() === label);
         if (btn) btn.classList.add('active');
     }
@@ -316,6 +316,7 @@ function clearColoring() {
 
 
 /* Some cleanup here for the toggling */
+let openMode = 'nothing';
 
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
@@ -327,7 +328,8 @@ function toggleMode() {
         `
             <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
-        
+            <button onclick="setOpenMode('start')">Place Start</button>
+            <button onclick="setOpenMode('end')">Place End</button>
         `;
         main.innerHTML = `
             <canvas id="openMap" width="800" height="600"></canvas>
@@ -339,32 +341,35 @@ function toggleMode() {
     }
 }
 
+function setOpenMode(m) {
+    openMode = m;
+    document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
+    const buttonMap = {
+        'start': 'Place Start',
+        'end': 'Place End',
+    };
+    const label = buttonMap[m];
+    if (label) {
+        const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.innerHTML.trim() === label);
+        if (btn) btn.classList.add('active');
+    }
+}
+
 function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
     let baseSpacing = 40;
     let offsetX = 0, offsetY = 0, zoomLevel = 1;
     let drag = false, startX, startY;
+    let openStart = null;
+    let openEnd = null;
 
     function drawGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const spacing = baseSpacing * zoomLevel;
-        const cols = Math.ceil(canvas.width / spacing) + 2;
-        const rows = Math.ceil(canvas.height / spacing) + 2;
-        const originX = -offsetX % spacing;
-        const originY = -offsetY % spacing;
-
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                const cx = x * spacing + originX;
-                const cy = y * spacing + originY;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-                ctx.strokeStyle = isLight ? '#333' : '#fff'; // try #000 for darkmode
-                ctx.stroke();
-            }
-        }
+        if (openStart) drawMarker(openStart.x, openStart.y, 'green');
+        if (openEnd) drawMarker(openEnd.x, openEnd.y, 'red');
     }
+
 
     canvas.addEventListener('mousedown', e => {
         drag = true;
@@ -373,8 +378,8 @@ function initOpen() {
     });
     canvas.addEventListener('mousemove', e => {
         if (drag) {
-            offsetX += e.clientX - startX;
-            offsetY += e.clientY - startY;
+            offsetX -= e.clientX - startX;
+            offsetY -= e.clientY - startY;
             startX = e.clientX;
             startY = e.clientY;
             drawGrid();
@@ -385,9 +390,46 @@ function initOpen() {
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
         const delta = e.deltaY > 0 ? -0.1 : 0.1; // try flipping
-        zoomLevel = Math.max(0.2, Math.min(2.5, zoomLevel + delta));
+        zoomLevel = Math.max(0.1, Math.min(1.3, zoomLevel + delta));
         drawGrid();
     });
+    canvas.addEventListener('click', e => {
+        const rect = canvas.getBoundingClientRect();
+        const { x, y } = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
+        if (openMode === 'start') openStart = {x, y};
+        else if (openMode === 'end') openEnd = {x, y};
+        if (openStart && openEnd) drawLineBetween(openStart, openEnd);
+        drawGrid();
+    });
+
+
+    function canvasToWorld(x, y) {
+        const spacing = baseSpacing * zoomLevel;
+        return {
+            x: Math.floor((x + offsetX) / spacing),
+            y: Math.floor((y + offsetY) / spacing)
+        };
+    }
+    function drawMarker(x, y, color) {
+        const spacing = baseSpacing * zoomLevel;
+        const cx = x * spacing - offsetX;
+        const cy = y * spacing - offsetY;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
+
+    function drawLineBetween(a, b) {
+        const spacing = baseSpacing * zoomLevel;
+        ctx.beginPath();
+        ctx.moveTo(a.x * spacing - offsetX, a.y * spacing - offsetY);
+        ctx.lineTo(b.x * spacing - offsetX, b.y * spacing - offsetY);
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.closePath();
+    }
 
     drawGrid();
 }
