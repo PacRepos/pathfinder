@@ -330,6 +330,7 @@ function toggleMode() {
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
             <button onclick="setOpenMode('start')">Place Start</button>
             <button onclick="setOpenMode('end')">Place End</button>
+            <button onclick="drawOpenPath()">Calculate Path</button>
         `;
         main.innerHTML = `
             <canvas id="openMap" width="800" height="600"></canvas>
@@ -346,7 +347,7 @@ function setOpenMode(m) {
     document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
     const buttonMap = {
         'start': 'Place Start',
-        'end': 'Place End',
+        'end': 'Place End'
     };
     const label = buttonMap[m];
     if (label) {
@@ -375,6 +376,7 @@ function initOpen() {
         drag = true;
         startX = e.clientX;
         startY = e.clientY;
+        canvas._dragStartTime = Date.now();
     });
     canvas.addEventListener('mousemove', e => {
         if (drag) {
@@ -394,11 +396,11 @@ function initOpen() {
         drawGrid();
     });
     canvas.addEventListener('click', e => {
+        if (Date.now() - canvas._dragStartTime > 150) return; // stop click if dragging
         const rect = canvas.getBoundingClientRect();
         const { x, y } = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
-        if (openMode === 'start') openStart = {x, y};
-        else if (openMode === 'end') openEnd = {x, y};
-        if (openStart && openEnd) drawLineBetween(openStart, openEnd);
+        if (openMode === 'start') openStart = { x, y };
+        else if (openMode === 'end') openEnd = { x, y };
         drawGrid();
     });
 
@@ -429,6 +431,12 @@ function initOpen() {
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.closePath();
+    }
+
+    function drawOpenPath() {
+        if (!openStart || !openEnd) return alert('Place both start and end points.');
+        drawGrid();
+        drawLineBetween(openStart, openEnd);
     }
 
     drawGrid();
