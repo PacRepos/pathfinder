@@ -589,7 +589,12 @@ function initOpen() {
                     continue;
                 }
 
-                const tentativeG = (gScore.get(key(current)) || Infinity) + 1;
+                const currentKey = key(current);
+                const currentG = gScore.has(currentKey) ? gScore.get(currentKey) : Infinity;
+                console.log("Current node:", current);
+                console.log("Current key:", key(current));
+                console.log("gScore keys:", Array.from(gScore.keys()));
+                const tentativeG = currentG + 1;
                 const neighborKey = key(neighbor);
                 const prevG = gScore.has(neighborKey) ? gScore.get(neighborKey) : Infinity;
                 console.log(`Neighbor: ${neighborKey}, TentativeG: ${tentativeG}, ExistingG: ${prevG}`);
