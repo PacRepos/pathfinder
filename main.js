@@ -481,6 +481,7 @@ function initOpen() {
     drawOpenPath = function() {
         if (!openStart || !openEnd) return alert('Place both start and end points.');
         drawGrid();
+        const spacing = baseSpacing * zoomLevel;
         ctx.beginPath();
         ctx.moveTo(openStart.x * spacing, openStart.y * spacing);
         ctx.lineTo(openEnd.x * spacing, openEnd.y * spacing);
@@ -491,7 +492,7 @@ function initOpen() {
     };
 
     drawLineBetween = function(start, end) {
-        const spacing = 40;
+        const spacing = baseSpacing * zoomLevel;
         const ctx = document.getElementById('openMap').getContext('2d');
         const openSet = [];
         const cameFrom = new Map();
