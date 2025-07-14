@@ -319,6 +319,10 @@ function clearColoring() {
 let openMode = 'nothing';
 let wallSegments = [], openStart = null, openEnd = null;
 let drawOpenPath, drawLineBetween;
+let spacing = 40;
+let offsetX = 0, offsetY = 0;
+let drag = false, startX, startY;
+let wallDrawStart = null;
 
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
@@ -363,10 +367,6 @@ function setOpenMode(m) {
 function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
-    let baseSpacing = 40;
-    let offsetX = 0, offsetY = 0, zoomLevel = 1;
-    let drag = false, startX, startY;
-    let wallDrawStart = null;
 
     function drawGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -432,12 +432,6 @@ function initOpen() {
         drag = false;
         wallDrawStart = null;
     });
-    canvas.addEventListener('wheel', e => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1;
-        zoomLevel = Math.max(0.1, Math.min(1.3, zoomLevel + delta));
-        drawGrid();
-    });
     canvas.addEventListener('click', e => {
         if (Date.now() - canvas._dragStartTime > 150) return;
         const rect = canvas.getBoundingClientRect();
@@ -453,14 +447,12 @@ function initOpen() {
 
 
     function canvasToWorld(x, y) {
-        const spacing = baseSpacing * zoomLevel;
         return {
             x: Math.floor((x + offsetX) / spacing),
             y: Math.floor((y + offsetY) / spacing)
         };
     }
     function drawMarker(x, y, color) {
-        const spacing = baseSpacing * zoomLevel;
         const cx = x * spacing - offsetX;
         const cy = y * spacing - offsetY;
         ctx.beginPath();
@@ -469,7 +461,6 @@ function initOpen() {
         ctx.fill();
     }
     function drawWall(seg, highlight = false) {
-        const spacing = baseSpacing * zoomLevel;
         ctx.beginPath();
         ctx.moveTo(seg.x1 * spacing - offsetX, seg.y1 * spacing - offsetY);
         ctx.lineTo(seg.x2 * spacing - offsetX, seg.y2 * spacing - offsetY);
@@ -481,7 +472,6 @@ function initOpen() {
     drawOpenPath = function() {
         if (!openStart || !openEnd) return alert('Place both start and end points.');
         drawGrid();
-        const spacing = baseSpacing * zoomLevel;
         ctx.beginPath();
         ctx.moveTo(openStart.x * spacing, openStart.y * spacing);
         ctx.lineTo(openEnd.x * spacing, openEnd.y * spacing);
@@ -492,7 +482,6 @@ function initOpen() {
     };
 
     drawLineBetween = function(start, end) {
-        const spacing = baseSpacing * zoomLevel;
         const ctx = document.getElementById('openMap').getContext('2d');
         const openSet = [];
         const cameFrom = new Map();
