@@ -319,7 +319,9 @@ function clearColoring() {
 let openMode = 'nothing';
 let wallSegments = [], openStart = null, openEnd = null;
 let drawOpenPath, drawLineBetween;
-let spacing = 10;
+let clearOpenPath, resetOpen;
+let openPath = null;
+let spacing = 1;
 let offsetX = 0, offsetY = 0;
 let drag = false, startX, startY;
 let wallDrawStart = null;
@@ -338,8 +340,11 @@ function toggleMode() {
             <button onclick="setOpenMode('end')">Place End</button>
             <button onclick="setOpenMode('wall')">Add/Remove Wall</button>
             <button onclick="drawOpenPath()">Calculate Path</button>
+            <button onclick='clearOpenPath()'>Clear Path</button>
+            <button onclick='resetOpen()'>Reset</button>
         `;
         main.innerHTML = `
+            <div id='weightDisplay'></div>
             <canvas id="openMap" width="800" height="600"></canvas>
         `;
         if (isLight) toggleTheme();
@@ -369,12 +374,22 @@ function initOpen() {
     const ctx = canvas.getContext('2d');
 
     function drawGrid() {
+        weightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
+        if (openPath && openPath.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(openPath[0].x * spacing - offsetX, openPath[0].y * spacing - offsetY);
+            for (let p of openPath) {
+                ctx.lineTo(p.x * spacing - offsetX, p.y * spacing - offsetY);
+            }
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         wallSegments.forEach(seg => drawWall(seg, seg.highlighted));
         if (openStart) drawMarker(openStart.x, openStart.y, 'green');
         if (openEnd) drawMarker(openEnd.x, openEnd.y, 'red');
     }
-
 
     canvas.addEventListener('mousedown', e => {
         const rect = canvas.getBoundingClientRect();
@@ -407,7 +422,7 @@ function initOpen() {
                 const closestX = seg.x1 + t * dx;
                 const closestY = seg.y1 + t * dy;
                 const dist = Math.sqrt((mouse.x - closestX) ** 2 + (mouse.y - closestY) ** 2);
-                seg.highlighted = dist < 0.3;
+                seg.highlighted = dist < 0.5;
             });
             drawGrid();
       }
@@ -442,6 +457,7 @@ function initOpen() {
             const index = wallSegments.findIndex(w => w.highlighted);
             if (index !== -1) wallSegments.splice(index, 1); // remove highlighted wall segment
         }
+        openPath = null;
         drawGrid();
     });
 
@@ -476,7 +492,6 @@ function initOpen() {
     };
 
     drawLineBetween = function(start, end) {
-        const ctx = document.getElementById('openMap').getContext('2d');
         const openSet = [];
         const closedSet = new Set();
         const cameFrom = new Map();
@@ -508,7 +523,6 @@ function initOpen() {
             ];
             return directions
                 .filter(dir => {
-                    const neighbor = {x: node.x + dir.x, y: node.y + dir.y};
                     if (Math.abs(dir.x) + Math.abs(dir.y) === 2) {
                         const check1 = {x: node.x + dir.x, y: node.y};
                         const check2 = {x: node.x, y: node.y + dir.y};
@@ -555,30 +569,15 @@ function initOpen() {
                 }
                 path.push(start);
                 path.reverse();
-                ctx.beginPath();
-                ctx.moveTo(path[0].x * spacing, path[0].y * spacing);
-                for (let p of path) {
-                    ctx.lineTo(p.x * spacing, p.y * spacing);
-                }
-                ctx.strokeStyle = 'blue';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
+                weightDisplay.innerHTML = `Total Path Weight: ${current.g.toFixed(2)}`;
+                openPath = path;
+                drawGrid();
                 return;
             }
 
             for (const neighbor of getNeighbors(current)) {
                 if (closedSet.has(key(neighbor))) continue; 
-                if (isBlocked(current, neighbor)) {
-                    // Debugging line:
-                    ctx.beginPath();
-                    ctx.moveTo(current.x * spacing, current.y * spacing);
-                    ctx.lineTo(neighbor.x * spacing, neighbor.y * spacing);
-                    ctx.strokeStyle = 'orange';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                    continue;
-                }
+                if (isBlocked(current, neighbor)) continue;
 
                 const currentKey = key(current);
                 const currentG = gScore.has(currentKey) ? gScore.get(currentKey) : Infinity;
@@ -599,10 +598,24 @@ function initOpen() {
         alert("No path found in open mode");
     };
 
+    clearOpenPath = function() {
+        openPath = null;
+        drawGrid();
+    };
+
+    resetOpen = function() {
+        wallSegments = [];
+        openStart = null;
+        openEnd = null;
+        openPath = null;
+        offsetX = 0;
+        offsetY = 0;
+        drag = false;
+        wallDrawStart = null;
+        drawGrid();
+    };
     drawGrid();
 }
-
-
 
 
 /*
