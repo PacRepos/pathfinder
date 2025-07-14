@@ -161,7 +161,7 @@ function handleClick(cell) {
 }
 
 function distance(a, b) {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); // Manhattan distance
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
 
@@ -317,6 +317,8 @@ function clearColoring() {
 
 /* Some cleanup here for the toggling */
 let openMode = 'nothing';
+let wallSegments = [], openStart = null, openEnd = null;
+let drawOpenPath, drawLineBetween;
 
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
@@ -356,23 +358,6 @@ function setOpenMode(m) {
         const btn = Array.from(document.querySelectorAll('#sidebar button')).find(b => b.innerHTML.trim() === label);
         if (btn) btn.classList.add('active');
     }
-}
-
-function drawOpenPath() {
-    if (!openStart || !openEnd) return alert('Place both start and end points.');
-    drawGrid();
-    drawLineBetween(openStart, openEnd);
-}
-
-function drawLineBetween(a, b) {
-    const spacing = baseSpacing * zoomLevel;
-    ctx.beginPath();
-    ctx.moveTo(a.x * spacing - offsetX, a.y * spacing - offsetY);
-    ctx.lineTo(b.x * spacing - offsetX, b.y * spacing - offsetY);
-    ctx.strokeStyle = 'blue';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.closePath();
 }
 
 function initOpen() {
@@ -425,7 +410,7 @@ function initOpen() {
                 const closestX = seg.x1 + t * dx;
                 const closestY = seg.y1 + t * dy;
                 const dist = Math.sqrt((mouse.x - closestX) ** 2 + (mouse.y - closestY) ** 2);
-                seg.highlighted = dist < 0.5;
+                seg.highlighted = dist < 0.3;
             });
             drawGrid();
       }
@@ -489,6 +474,94 @@ function initOpen() {
         ctx.lineWidth = 3;
         ctx.stroke();
     }
+
+    drawOpenPath = function() {
+        if (!openStart || !openEnd) return alert('Place both start and end points.');
+        drawGrid();
+        drawLineBetween(openStart, openEnd);
+    };
+
+    drawLineBetween = function(start, end) {
+        const spacing = 40;
+        const openSet = [start];
+        const cameFrom = new Map();
+        const gScore = new Map();
+        const fScore = new Map();
+        const key = (p) => `${p.x},${p.y}`;
+        const ctx = document.getElementById('openMap').getContext('2d'); // redef so func works with outside calls
+
+        gScore.set(key(start), 0);
+        fScore.set(key(start), heuristic(start, end));
+
+        function heuristic(a, b) {
+            return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        }
+
+        function getNeighbors(node) {
+            const directions = [
+                {x: 1, y: 0}, {x: -1, y: 0},
+                {x: 0, y: 1}, {x: 0, y: -1},
+                {x: 1, y: 1}, {x: -1, y: -1},
+                {x: 1, y: -1}, {x: -1, y: 1}
+            ];
+            return directions.map(d => ({x: node.x + d.x, y: node.y + d.y}));
+        }
+
+        function isBlocked(from, to) { // if a wall segment lies on from->to
+            return wallSegments.some(seg =>
+                linesIntersect(from, to, {x: seg.x1, y: seg.y1}, {x: seg.x2, y: seg.y2})
+            );
+        }
+
+        function linesIntersect(p1, p2, q1, q2) { // cross product method
+            function ccw(a, b, c) {
+                return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x);
+            }
+            return (ccw(p1, q1, q2) !== ccw(p2, q1, q2)) && (ccw(p1, p2, q1) !== ccw(p1, p2, q2));
+        }
+
+        while (openSet.length > 0) {
+            openSet.sort((a, b) => (fScore.get(key(a)) || Infinity) - (fScore.get(key(b)) || Infinity));
+            const current = openSet.shift();
+
+            if (current.x === end.x && current.y === end.y) {
+                const path = [];
+                let temp = key(current);
+                while (cameFrom.has(temp)) {
+                    const pt = cameFrom.get(temp);
+                    path.push(pt);
+                    temp = key(pt);
+                }
+                path.reverse();
+
+                ctx.beginPath();
+                ctx.moveTo(start.x * spacing, start.y * spacing);
+                for (let p of path) {
+                    ctx.lineTo(p.x * spacing, p.y * spacing);
+                }
+                ctx.lineTo(end.x * spacing, end.y * spacing);
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                return;
+            }
+
+            for (const neighbor of getNeighbors(current)) {
+                if (isBlocked(current, neighbor)) continue;
+                const tG = (gScore.get(key(current)) || Infinity) + 1;
+                if (tG < (gScore.get(key(neighbor)) || Infinity)) {
+                    cameFrom.set(key(neighbor), current);
+                    gScore.set(key(neighbor), tG);
+                    fScore.set(key(neighbor), tG + heuristic(neighbor, end));
+                    if (!openSet.some(n => n.x === neighbor.x && n.y === neighbor.y)) {
+                        openSet.push(neighbor);
+                    }
+                }
+            }
+        }
+
+        alert("No path found in open mode");
+    };
 
     drawGrid();
 }
