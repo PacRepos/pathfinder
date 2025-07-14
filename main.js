@@ -383,7 +383,7 @@ function initOpen() {
                 ctx.lineTo(p.x * spacing - offsetX, p.y * spacing - offsetY);
             }
             ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 4;
             ctx.stroke();
         }
         wallSegments.forEach(seg => drawWall(seg, seg.highlighted));
@@ -485,6 +485,29 @@ function initOpen() {
         ctx.stroke();
     }
 
+    function smoothPath(path, isBlocked) {
+        if (path.length <= 2) return path;
+        const smoothed = [];
+        let i = 0;
+        while (i < path.length) {
+            smoothed.push(path[i]);
+            let j = path.length - 1;
+            while (j > i + 1) {
+                if (!isBlocked(path[i], path[j])) {
+                    i = j - 1;
+                    break;
+                }
+                j--;
+            }
+            i++;
+        }
+        // add end point
+        if (key(smoothed[smoothed.length - 1]) !== key(path[path.length - 1])) {
+            smoothed.push(path[path.length - 1]);
+        }
+        return smoothed;
+    }
+
     drawOpenPath = function() {
         if (!openStart || !openEnd) return alert('Place both start and end points.');
         drawGrid();
@@ -572,7 +595,8 @@ function initOpen() {
                 const currentKey = key(curr);
                 const currentG = gScore.get(currentKey);
                 weightDisplay.innerHTML = `Total Path Weight: ${currentG.toFixed(2)}`;
-                openPath = path;
+                const smoothed = smoothPath(path, isBlocked);
+                openPath = smoothed;
                 drawGrid();
                 return;
             }
