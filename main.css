@@ -1,6 +1,5 @@
 * {
   font-family: monospace;
-  /* font-family: sans-serif; */
   box-sizing: border-box;
 }
 
@@ -159,8 +158,8 @@ body.light-mode .cell {
 
 
 #openMap {
-  background-color: #666;
-  border: 1px solid #555;
+  background-color: #777;
+  border: 1px solid #666;
 }
 body.light-mode #openMap {
   background-color: #ddd;

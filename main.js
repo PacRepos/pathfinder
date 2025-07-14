@@ -330,6 +330,7 @@ function toggleMode() {
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
             <button onclick="setOpenMode('start')">Place Start</button>
             <button onclick="setOpenMode('end')">Place End</button>
+            <button onclick="setOpenMode('wall')">Add/Remove Wall</button>
             <button onclick="drawOpenPath()">Calculate Path</button>
         `;
         main.innerHTML = `
@@ -347,7 +348,8 @@ function setOpenMode(m) {
     document.querySelectorAll('#sidebar button').forEach(btn => btn.classList.remove('active'));
     const buttonMap = {
         'start': 'Place Start',
-        'end': 'Place End'
+        'end': 'Place End',
+        'wall': 'Add/Remove Wall'
     };
     const label = buttonMap[m];
     if (label) {
@@ -364,9 +366,11 @@ function initOpen() {
     let drag = false, startX, startY;
     let openStart = null;
     let openEnd = null;
+    let wallSegments = [];
 
     function drawGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        wallSegments.forEach(seg => drawWall(seg, seg.highlighted));
         if (openStart) drawMarker(openStart.x, openStart.y, 'green');
         if (openEnd) drawMarker(openEnd.x, openEnd.y, 'red');
     }
@@ -385,22 +389,50 @@ function initOpen() {
             startX = e.clientX;
             startY = e.clientY;
             drawGrid();
+        } else if (openMode === 'wall') {
+            const rect = canvas.getBoundingClientRect();
+            const mouse = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
+            wallSegments.forEach(seg => {
+                const dx = seg.x2 - seg.x1;
+                const dy = seg.y2 - seg.y1;
+                const lenSq = dx * dx + dy * dy;
+                const t = ((mouse.x - seg.x1) * dx + (mouse.y - seg.y1) * dy) / lenSq;
+                const closestX = seg.x1 + t * dx;
+                const closestY = seg.y1 + t * dy;
+                const dist = Math.sqrt((mouse.x - closestX) ** 2 + (mouse.y - closestY) ** 2);
+                seg.highlighted = dist < 0.5;
+            });
+            drawGrid();
+      }
+    });
+    canvas.addEventListener('mouseup', e => {
+        if (!drag || Date.now() - canvas._dragStartTime > 150) return;
+        drag = false;
+        if (openMode === 'wall') {
+            const rect = canvas.getBoundingClientRect();
+            const start = canvasToWorld(startX - rect.left, startY - rect.top);
+            const end = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
+            wallSegments.push({x1: start.x, y1: start.y, x2: end.x, y2: end.y, highlighted: false});
+            drawGrid();
         }
     });
-    canvas.addEventListener('mouseup', () => drag = false);
     canvas.addEventListener('mouseleave', () => drag = false);
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1; // try flipping
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
         zoomLevel = Math.max(0.1, Math.min(1.3, zoomLevel + delta));
         drawGrid();
     });
     canvas.addEventListener('click', e => {
-        if (Date.now() - canvas._dragStartTime > 150) return; // stop click if dragging
+        if (Date.now() - canvas._dragStartTime > 150) return;
         const rect = canvas.getBoundingClientRect();
-        const { x, y } = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
-        if (openMode === 'start') openStart = { x, y };
-        else if (openMode === 'end') openEnd = { x, y };
+        const {x, y} = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
+        if (openMode === 'start') openStart = {x, y};
+        else if (openMode === 'end') openEnd = {x, y};
+        else if (openMode === 'wall') {
+            const index = wallSegments.findIndex(w => w.highlighted);
+            if (index !== -1) wallSegments.splice(index, 1); // remove highlighted wall segment
+        }
         drawGrid();
     });
 
@@ -420,6 +452,15 @@ function initOpen() {
         ctx.arc(cx, cy, 8, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
+    }
+    function drawWall(seg, highlight = false) {
+        const spacing = baseSpacing * zoomLevel;
+        ctx.beginPath();
+        ctx.moveTo(seg.x1 * spacing - offsetX, seg.y1 * spacing - offsetY);
+        ctx.lineTo(seg.x2 * spacing - offsetX, seg.y2 * spacing - offsetY);
+        ctx.strokeStyle = highlight ? 'red' : 'black';
+        ctx.lineWidth = 3;
+        ctx.stroke();
     }
 
     function drawLineBetween(a, b) {
