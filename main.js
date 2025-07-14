@@ -472,18 +472,13 @@ function initOpen() {
     drawOpenPath = function() {
         if (!openStart || !openEnd) return alert('Place both start and end points.');
         drawGrid();
-        ctx.beginPath();
-        ctx.moveTo(openStart.x * spacing, openStart.y * spacing);
-        ctx.lineTo(openEnd.x * spacing, openEnd.y * spacing);
-        ctx.strokeStyle = 'magenta';
-        ctx.lineWidth = 2;
-        ctx.stroke();
         drawLineBetween(openStart, openEnd);
     };
 
     drawLineBetween = function(start, end) {
         const ctx = document.getElementById('openMap').getContext('2d');
         const openSet = [];
+        const closedSet = new Set();
         const cameFrom = new Map();
         const gScore = new Map();
         const fScore = new Map();
@@ -538,12 +533,17 @@ function initOpen() {
         while (openSet.length > 0) {
             openSet.sort((a, b) => (fScore.get(key(a)) || Infinity) - (fScore.get(key(b)) || Infinity));
             const current = openSet.shift();
+            closedSet.add(key(current));
+            console.log("Open set length:", openSet.length);
+            console.log("Current best node:", current);
             if (!current) {
                 console.error("Open set empty unexpectedly");
                 break;
             }
 
             if (current.x === end.x && current.y === end.y) {
+                console.log("Reached end:", current);
+                console.log("cameFrom map:", cameFrom);
                 const path = [];
                 let curr = current;
                 while (key(curr) !== key(start)) {
@@ -566,6 +566,7 @@ function initOpen() {
             }
 
             for (const neighbor of getNeighbors(current)) {
+                if (closedSet.has(key(neighbor))) continue; 
                 console.log("Checking neighbor:", neighbor);
                 if (isBlocked(current, neighbor)) {
                     console.log("Blocked:", current, "->", neighbor);
