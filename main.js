@@ -367,9 +367,6 @@ function initOpen() {
     let offsetX = 0, offsetY = 0, zoomLevel = 1;
     let drag = false, startX, startY;
     let wallDrawStart = null;
-    let openStart = null;
-    let openEnd = null;
-    let wallSegments = [];
 
     function drawGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
