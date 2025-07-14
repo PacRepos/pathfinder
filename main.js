@@ -483,6 +483,9 @@ function initOpen() {
         const gScore = new Map();
         const fScore = new Map();
         const key = (p) => `${p.x},${p.y}`;
+        gScore.clear();
+        fScore.clear();
+        cameFrom.clear();
 
         // Round coordinates to grid
         start = {x: Math.round(start.x), y: Math.round(start.y)};
@@ -507,13 +510,16 @@ function initOpen() {
                 .filter(dir => {
                     const neighbor = {x: node.x + dir.x, y: node.y + dir.y};
                     if (Math.abs(dir.x) + Math.abs(dir.y) === 2) {
-                        const check1 = {x: node.x + dir.x, y: node.y}; // if blocked diagonals
+                        const check1 = {x: node.x + dir.x, y: node.y};
                         const check2 = {x: node.x, y: node.y + dir.y};
                         if (isBlocked(node, check1) || isBlocked(node, check2)) return false;
                     }
                     return true;
                 })
-                .map(dir => ({x: node.x + dir.x, y: node.y + dir.y}));
+                .map(dir => ({
+                    x: Math.round(node.x + dir.x),
+                    y: Math.round(node.y + dir.y)
+                }));
         }
         function isBlocked(from, to) {
             if (!Array.isArray(wallSegments)) return false;
@@ -586,6 +592,7 @@ function initOpen() {
                 const tentativeG = (gScore.get(key(current)) || Infinity) + 1;
                 const neighborKey = key(neighbor);
                 const prevG = gScore.has(neighborKey) ? gScore.get(neighborKey) : Infinity;
+                console.log(`Neighbor: ${neighborKey}, TentativeG: ${tentativeG}, ExistingG: ${prevG}`);
                 if (tentativeG < prevG) {
                     cameFrom.set(neighborKey, current);
                     gScore.set(neighborKey, tentativeG);
