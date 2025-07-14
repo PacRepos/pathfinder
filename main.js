@@ -374,6 +374,7 @@ function initOpen() {
     const ctx = canvas.getContext('2d');
 
     function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         weightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
         if (openPath && openPath.length > 1) {
             ctx.beginPath();
@@ -385,7 +386,6 @@ function initOpen() {
             ctx.lineWidth = 2;
             ctx.stroke();
         }
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         wallSegments.forEach(seg => drawWall(seg, seg.highlighted));
         if (openStart) drawMarker(openStart.x, openStart.y, 'green');
         if (openEnd) drawMarker(openEnd.x, openEnd.y, 'red');
