@@ -538,26 +538,30 @@ function initOpen() {
         while (openSet.length > 0) {
             openSet.sort((a, b) => (fScore.get(key(a)) || Infinity) - (fScore.get(key(b)) || Infinity));
             const current = openSet.shift();
+            if (!current) {
+                console.error("Open set empty unexpectedly");
+                break;
+            }
 
             if (current.x === end.x && current.y === end.y) {
                 const path = [];
-                let tempKey = key(current);
-                while (cameFrom.has(tempKey)) {
-                    const pt = cameFrom.get(tempKey);
-                    path.push(pt);
-                    tempKey = key(pt);
+                let curr = current;
+                while (key(curr) !== key(start)) {
+                    path.push(curr);
+                    curr = cameFrom.get(key(curr));
+                    if (!curr) break; // safety check
                 }
+                path.push(start);
                 path.reverse();
-
                 ctx.beginPath();
-                ctx.moveTo(start.x * spacing, start.y * spacing);
+                ctx.moveTo(path[0].x * spacing, path[0].y * spacing);
                 for (let p of path) {
                     ctx.lineTo(p.x * spacing, p.y * spacing);
                 }
-                ctx.lineTo(end.x * spacing, end.y * spacing);
                 ctx.strokeStyle = 'blue';
                 ctx.lineWidth = 2;
                 ctx.stroke();
+
                 return;
             }
 
