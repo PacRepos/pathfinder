@@ -569,7 +569,9 @@ function initOpen() {
                 }
                 path.push(start);
                 path.reverse();
-                weightDisplay.innerHTML = `Total Path Weight: ${current.g.toFixed(2)}`;
+                const currentKey = key(curr);
+                const currentG = gScore.get(currentKey);
+                weightDisplay.innerHTML = `Total Path Weight: ${currentG.toFixed(2)}`;
                 openPath = path;
                 drawGrid();
                 return;
