@@ -515,12 +515,15 @@ function initOpen() {
                 })
                 .map(dir => ({x: node.x + dir.x, y: node.y + dir.y}));
         }
-
         function isBlocked(from, to) {
             if (!Array.isArray(wallSegments)) return false;
-            return wallSegments.some(seg =>
+            const blocked = wallSegments.some(seg =>
                 linesIntersect(from, to, {x: seg.x1, y: seg.y1}, {x: seg.x2, y: seg.y2})
             );
+            if (blocked) {
+                console.log("Blocked path:", from, "->", to);
+            }
+            return blocked;
         }
 
         function linesIntersect(p1, p2, q1, q2) { // cross product
@@ -581,13 +584,18 @@ function initOpen() {
                 }
 
                 const tentativeG = (gScore.get(key(current)) || Infinity) + 1;
-                if (tentativeG < (gScore.get(key(neighbor)) || Infinity)) {
-                    cameFrom.set(key(neighbor), current);
-                    gScore.set(key(neighbor), tentativeG);
-                    fScore.set(key(neighbor), tentativeG + heuristic(neighbor, end));
+                const neighborKey = key(neighbor);
+                const prevG = gScore.has(neighborKey) ? gScore.get(neighborKey) : Infinity;
+                if (tentativeG < prevG) {
+                    cameFrom.set(neighborKey, current);
+                    gScore.set(neighborKey, tentativeG);
+                    fScore.set(neighborKey, tentativeG + heuristic(neighbor, end));
                     if (!openSet.some(n => n.x === neighbor.x && n.y === neighbor.y)) {
+                        console.log("Adding to openSet:", neighbor);
                         openSet.push(neighbor);
                     }
+                } else {
+                    console.log("Skipping neighbor (not better g):", neighbor);
                 }
             }
         }
