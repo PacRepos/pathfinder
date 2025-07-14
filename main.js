@@ -416,7 +416,13 @@ function initOpen() {
         if (openMode === 'wall' && wallDrawStart) {
             const rect = canvas.getBoundingClientRect();
             const end = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
-            wallSegments.push({x1: wallDrawStart.x, y1: wallDrawStart.y, x2: end.x, y2: end.y, highlighted: false});
+            wallSegments.push({
+                x1: Math.round(wallDrawStart.x),
+                y1: Math.round(wallDrawStart.y),
+                x2: Math.round(end.x),
+                y2: Math.round(end.y),
+                highlighted: false
+            });
             wallDrawStart = null;
             drawGrid();
         }
@@ -506,7 +512,17 @@ function initOpen() {
                 {x: 1, y: 1}, {x: -1, y: -1},
                 {x: 1, y: -1}, {x: -1, y: 1}
             ];
-            return directions.map(d => ({x: node.x + d.x, y: node.y + d.y}));
+            return directions
+                .filter(dir => {
+                    const neighbor = {x: node.x + dir.x, y: node.y + dir.y};
+                    if (Math.abs(dir.x) + Math.abs(dir.y) === 2) {
+                        const check1 = {x: node.x + dir.x, y: node.y}; // if blocked diagonals
+                        const check2 = {x: node.x, y: node.y + dir.y};
+                        if (isBlocked(node, check1) || isBlocked(node, check2)) return false;
+                    }
+                    return true;
+                })
+                .map(dir => ({x: node.x + dir.x, y: node.y + dir.y}));
         }
 
         function isBlocked(from, to) {
@@ -550,7 +566,16 @@ function initOpen() {
             }
 
             for (const neighbor of getNeighbors(current)) {
-                if (isBlocked(current, neighbor)) continue;
+                if (isBlocked(current, neighbor)) {
+                    // Debugging line:
+                    ctx.beginPath();
+                    ctx.moveTo(current.x * spacing, current.y * spacing);
+                    ctx.lineTo(neighbor.x * spacing, neighbor.y * spacing);
+                    ctx.strokeStyle = 'orange';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    continue;
+                }
 
                 const tentativeG = (gScore.get(key(current)) || Infinity) + 1;
                 if (tentativeG < (gScore.get(key(neighbor)) || Infinity)) {
