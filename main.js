@@ -319,7 +319,7 @@ function clearColoring() {
 let openMode = 'nothing';
 let wallSegments = [], openStart = null, openEnd = null;
 let drawOpenPath, drawLineBetween;
-let spacing = 40;
+let spacing = 10;
 let offsetX = 0, offsetY = 0;
 let drag = false, startX, startY;
 let wallDrawStart = null;
@@ -526,9 +526,6 @@ function initOpen() {
             const blocked = wallSegments.some(seg =>
                 linesIntersect(from, to, {x: seg.x1, y: seg.y1}, {x: seg.x2, y: seg.y2})
             );
-            if (blocked) {
-                console.log("Blocked path:", from, "->", to);
-            }
             return blocked;
         }
 
@@ -543,16 +540,12 @@ function initOpen() {
             openSet.sort((a, b) => (fScore.get(key(a)) || Infinity) - (fScore.get(key(b)) || Infinity));
             const current = openSet.shift();
             closedSet.add(key(current));
-            console.log("Open set length:", openSet.length);
-            console.log("Current best node:", current);
             if (!current) {
                 console.error("Open set empty unexpectedly");
                 break;
             }
 
             if (current.x === end.x && current.y === end.y) {
-                console.log("Reached end:", current);
-                console.log("cameFrom map:", cameFrom);
                 const path = [];
                 let curr = current;
                 while (key(curr) !== key(start)) {
@@ -576,9 +569,7 @@ function initOpen() {
 
             for (const neighbor of getNeighbors(current)) {
                 if (closedSet.has(key(neighbor))) continue; 
-                console.log("Checking neighbor:", neighbor);
                 if (isBlocked(current, neighbor)) {
-                    console.log("Blocked:", current, "->", neighbor);
                     // Debugging line:
                     ctx.beginPath();
                     ctx.moveTo(current.x * spacing, current.y * spacing);
@@ -591,23 +582,16 @@ function initOpen() {
 
                 const currentKey = key(current);
                 const currentG = gScore.has(currentKey) ? gScore.get(currentKey) : Infinity;
-                console.log("Current node:", current);
-                console.log("Current key:", key(current));
-                console.log("gScore keys:", Array.from(gScore.keys()));
                 const tentativeG = currentG + 1;
                 const neighborKey = key(neighbor);
                 const prevG = gScore.has(neighborKey) ? gScore.get(neighborKey) : Infinity;
-                console.log(`Neighbor: ${neighborKey}, TentativeG: ${tentativeG}, ExistingG: ${prevG}`);
                 if (tentativeG < prevG) {
                     cameFrom.set(neighborKey, current);
                     gScore.set(neighborKey, tentativeG);
                     fScore.set(neighborKey, tentativeG + heuristic(neighbor, end));
                     if (!openSet.some(n => n.x === neighbor.x && n.y === neighbor.y)) {
-                        console.log("Adding to openSet:", neighbor);
                         openSet.push(neighbor);
                     }
-                } else {
-                    console.log("Skipping neighbor (not better g):", neighbor);
                 }
             }
         }
