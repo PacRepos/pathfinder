@@ -483,13 +483,18 @@ function initOpen() {
 
     drawLineBetween = function(start, end) {
         const spacing = 40;
-        const openSet = [start];
+        const ctx = document.getElementById('openMap').getContext('2d');
+        const openSet = [];
         const cameFrom = new Map();
         const gScore = new Map();
         const fScore = new Map();
         const key = (p) => `${p.x},${p.y}`;
-        const ctx = document.getElementById('openMap').getContext('2d'); // redef so func works with outside calls
 
+        // Round coordinates to grid
+        start = {x: Math.round(start.x), y: Math.round(start.y)};
+        end = {x: Math.round(end.x), y: Math.round(end.y)};
+
+        openSet.push(start);
         gScore.set(key(start), 0);
         fScore.set(key(start), heuristic(start, end));
 
@@ -507,13 +512,14 @@ function initOpen() {
             return directions.map(d => ({x: node.x + d.x, y: node.y + d.y}));
         }
 
-        function isBlocked(from, to) { // if a wall segment lies on from->to
+        function isBlocked(from, to) {
+            if (!Array.isArray(wallSegments)) return false;
             return wallSegments.some(seg =>
                 linesIntersect(from, to, {x: seg.x1, y: seg.y1}, {x: seg.x2, y: seg.y2})
             );
         }
 
-        function linesIntersect(p1, p2, q1, q2) { // cross product method
+        function linesIntersect(p1, p2, q1, q2) { // cross product
             function ccw(a, b, c) {
                 return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x);
             }
@@ -526,11 +532,11 @@ function initOpen() {
 
             if (current.x === end.x && current.y === end.y) {
                 const path = [];
-                let temp = key(current);
-                while (cameFrom.has(temp)) {
-                    const pt = cameFrom.get(temp);
+                let tempKey = key(current);
+                while (cameFrom.has(tempKey)) {
+                    const pt = cameFrom.get(tempKey);
                     path.push(pt);
-                    temp = key(pt);
+                    tempKey = key(pt);
                 }
                 path.reverse();
 
@@ -548,11 +554,12 @@ function initOpen() {
 
             for (const neighbor of getNeighbors(current)) {
                 if (isBlocked(current, neighbor)) continue;
-                const tG = (gScore.get(key(current)) || Infinity) + 1;
-                if (tG < (gScore.get(key(neighbor)) || Infinity)) {
+
+                const tentativeG = (gScore.get(key(current)) || Infinity) + 1;
+                if (tentativeG < (gScore.get(key(neighbor)) || Infinity)) {
                     cameFrom.set(key(neighbor), current);
-                    gScore.set(key(neighbor), tG);
-                    fScore.set(key(neighbor), tG + heuristic(neighbor, end));
+                    gScore.set(key(neighbor), tentativeG);
+                    fScore.set(key(neighbor), tentativeG + heuristic(neighbor, end));
                     if (!openSet.some(n => n.x === neighbor.x && n.y === neighbor.y)) {
                         openSet.push(neighbor);
                     }
