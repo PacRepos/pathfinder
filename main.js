@@ -481,6 +481,12 @@ function initOpen() {
     drawOpenPath = function() {
         if (!openStart || !openEnd) return alert('Place both start and end points.');
         drawGrid();
+        ctx.beginPath();
+        ctx.moveTo(openStart.x * spacing, openStart.y * spacing);
+        ctx.lineTo(openEnd.x * spacing, openEnd.y * spacing);
+        ctx.strokeStyle = 'magenta';
+        ctx.lineWidth = 2;
+        ctx.stroke();
         drawLineBetween(openStart, openEnd);
     };
 
@@ -566,7 +572,9 @@ function initOpen() {
             }
 
             for (const neighbor of getNeighbors(current)) {
+                console.log("Checking neighbor:", neighbor);
                 if (isBlocked(current, neighbor)) {
+                    console.log("Blocked:", current, "->", neighbor);
                     // Debugging line:
                     ctx.beginPath();
                     ctx.moveTo(current.x * spacing, current.y * spacing);
