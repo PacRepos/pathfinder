@@ -358,12 +358,30 @@ function setOpenMode(m) {
     }
 }
 
+function drawOpenPath() {
+    if (!openStart || !openEnd) return alert('Place both start and end points.');
+    drawGrid();
+    drawLineBetween(openStart, openEnd);
+}
+
+function drawLineBetween(a, b) {
+    const spacing = baseSpacing * zoomLevel;
+    ctx.beginPath();
+    ctx.moveTo(a.x * spacing - offsetX, a.y * spacing - offsetY);
+    ctx.lineTo(b.x * spacing - offsetX, b.y * spacing - offsetY);
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.closePath();
+}
+
 function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
     let baseSpacing = 40;
     let offsetX = 0, offsetY = 0, zoomLevel = 1;
     let drag = false, startX, startY;
+    let wallDrawStart = null;
     let openStart = null;
     let openEnd = null;
     let wallSegments = [];
@@ -377,9 +395,16 @@ function initOpen() {
 
 
     canvas.addEventListener('mousedown', e => {
-        drag = true;
-        startX = e.clientX;
-        startY = e.clientY;
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        if (openMode === 'wall') {
+            wallDrawStart = canvasToWorld(mx, my);
+        } else {
+            drag = true;
+            startX = e.clientX;
+            startY = e.clientY;
+        }
         canvas._dragStartTime = Date.now();
     });
     canvas.addEventListener('mousemove', e => {
@@ -406,17 +431,19 @@ function initOpen() {
       }
     });
     canvas.addEventListener('mouseup', e => {
-        if (!drag || Date.now() - canvas._dragStartTime > 150) return;
-        drag = false;
-        if (openMode === 'wall') {
+        if (openMode === 'wall' && wallDrawStart) {
             const rect = canvas.getBoundingClientRect();
-            const start = canvasToWorld(startX - rect.left, startY - rect.top);
             const end = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
-            wallSegments.push({x1: start.x, y1: start.y, x2: end.x, y2: end.y, highlighted: false});
+            wallSegments.push({x1: wallDrawStart.x, y1: wallDrawStart.y, x2: end.x, y2: end.y, highlighted: false});
+            wallDrawStart = null;
             drawGrid();
         }
+        drag = false;
     });
-    canvas.addEventListener('mouseleave', () => drag = false);
+    canvas.addEventListener('mouseleave', () => {
+        drag = false;
+        wallDrawStart = null;
+    });
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
         const delta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -461,23 +488,6 @@ function initOpen() {
         ctx.strokeStyle = highlight ? 'red' : 'black';
         ctx.lineWidth = 3;
         ctx.stroke();
-    }
-
-    function drawLineBetween(a, b) {
-        const spacing = baseSpacing * zoomLevel;
-        ctx.beginPath();
-        ctx.moveTo(a.x * spacing - offsetX, a.y * spacing - offsetY);
-        ctx.lineTo(b.x * spacing - offsetX, b.y * spacing - offsetY);
-        ctx.strokeStyle = 'blue';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.closePath();
-    }
-
-    function drawOpenPath() {
-        if (!openStart || !openEnd) return alert('Place both start and end points.');
-        drawGrid();
-        drawLineBetween(openStart, openEnd);
     }
 
     drawGrid();
