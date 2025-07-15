@@ -325,7 +325,8 @@ let spacing = 1;
 let offsetX = 0, offsetY = 0;
 let drag = false, startX, startY;
 let wallDrawStart = null;
-const snap_radius = 1.5;
+const snap_radius = 2;
+const highlight_radius = 1;
 let currentSnapCandidate = null;
 
 function toggleMode() {
@@ -442,7 +443,7 @@ function initOpen() {
                 const closestX = seg.x1 + t * dx;
                 const closestY = seg.y1 + t * dy;
                 const dist = Math.sqrt((mouse.x - closestX) ** 2 + (mouse.y - closestY) ** 2);
-                seg.highlighted = dist < 2;
+                seg.highlighted = dist < highlight_radius;
             });
             findSnapPoint(mouse);
             drawGrid();
