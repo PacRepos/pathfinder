@@ -325,6 +325,8 @@ let spacing = 1;
 let offsetX = 0, offsetY = 0;
 let drag = false, startX, startY;
 let wallDrawStart = null;
+const snap_radius = 1.5;
+let currentSnapCandidate = null;
 
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
@@ -394,6 +396,17 @@ function initOpen() {
             ctx.stroke();
         }
         wallSegments.forEach(seg => drawWall(seg, seg.highlighted));
+        if (currentSnapCandidate) {
+            const snapX = currentSnapCandidate.x * spacing - offsetX;
+            const snapY = currentSnapCandidate.y * spacing - offsetY;
+            ctx.beginPath();
+            ctx.arc(snapX, snapY, 8, 0, Math.PI * 2);
+            ctx.fillStyle = 'orange';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'darkorange';
+            ctx.stroke();
+        }
         if (openStart) drawMarker(openStart.x, openStart.y, 'green');
         if (openEnd) drawMarker(openEnd.x, openEnd.y, 'red');
     }
@@ -429,20 +442,23 @@ function initOpen() {
                 const closestX = seg.x1 + t * dx;
                 const closestY = seg.y1 + t * dy;
                 const dist = Math.sqrt((mouse.x - closestX) ** 2 + (mouse.y - closestY) ** 2);
-                seg.highlighted = dist < 0.5;
+                seg.highlighted = dist < 2;
             });
+            findSnapPoint(mouse);
             drawGrid();
-      }
+        }
     });
     canvas.addEventListener('mouseup', e => {
         if (openMode === 'wall' && wallDrawStart) {
             const rect = canvas.getBoundingClientRect();
             const end = canvasToWorld(e.clientX - rect.left, e.clientY - rect.top);
+            const snappedStart = findSnapPoint(wallDrawStart);
+            const snappedEnd = findSnapPoint(end);
             wallSegments.push({
-                x1: Math.round(wallDrawStart.x),
-                y1: Math.round(wallDrawStart.y),
-                x2: Math.round(end.x),
-                y2: Math.round(end.y),
+                x1: Math.round(snappedStart.x),
+                y1: Math.round(snappedStart.y),
+                x2: Math.round(snappedEnd.x),
+                y2: Math.round(snappedEnd.y),
                 highlighted: false
             });
             wallDrawStart = null;
@@ -630,6 +646,25 @@ function initOpen() {
 
         alert("No path found in open mode");
     };
+
+    function findSnapPoint(target) {
+        currentSnapCandidate = null;
+        for (let seg of wallSegments) {
+            const ends = [
+                {x: seg.x1, y: seg.y1},
+                {x: seg.x2, y: seg.y2}
+            ];
+            for (let end of ends) {
+                const dx = target.x - end.x;
+                const dy = target.y - end.y;
+                if (Math.sqrt(dx * dx + dy * dy) <= snap_radius) {
+                    currentSnapCandidate = {x: end.x, y: end.y};
+                    return currentSnapCandidate;
+                }
+            }
+        }
+        return target;
+    }
 
     clearOpenPath = function() {
         openPath = null;
