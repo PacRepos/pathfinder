@@ -325,15 +325,15 @@ let spacing = 1;
 let offsetX = 0, offsetY = 0;
 let drag = false, startX, startY;
 let wallDrawStart = null;
+const openAnimationToggle = document.getElementById('openAnimate');
+const openWeightDisplay = document.getElementById('openWeightDisplay');
 
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
     const sidebar = document.getElementById('sidebar');
     const main = document.getElementById('main');
     if (isOpenMode) {
-
-        sidebar.innerHTML =
-        `
+        sidebar.innerHTML = `
             <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
             <button onclick="setOpenMode('start')">Place Start</button>
@@ -342,9 +342,10 @@ function toggleMode() {
             <button onclick="drawOpenPath()">Calculate Path</button>
             <button onclick='clearOpenPath()'>Clear Path</button>
             <button onclick='resetOpen()'>Reset</button>
+            <label><input type='checkbox' id='openAnimate' checked> Show Pathfinding Animation</label>
         `;
         main.innerHTML = `
-            <div id='weightDisplay'></div>
+            <div id='openWeightDisplay'></div>
             <canvas id="openMap" width="800" height="600"></canvas>
         `;
         if (isLight) toggleTheme();
@@ -373,14 +374,25 @@ function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
 
-    function drawGrid() {
+    async function drawGrid() {
+        openWeightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        weightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
         if (openPath && openPath.length > 1) {
+            let totalWeight = 0;
+            for (let i = 1; i < openPath.length; i++) {
+                const dx = openPath[i].x - openPath[i - 1].x;
+                const dy = openPath[i].y - openPath[i - 1].y;
+                totalWeight += Math.sqrt(dx * dx + dy * dy);
+            }
+            openWeightDisplay.innerHTML = `Total Path Weight: ${totalWeight.toFixed(2)}`;
+
             ctx.beginPath();
             ctx.moveTo(openPath[0].x * spacing - offsetX, openPath[0].y * spacing - offsetY);
             for (let p of openPath) {
                 ctx.lineTo(p.x * spacing - offsetX, p.y * spacing - offsetY);
+                if (openAnimationToggle.checked) {
+                    await new Promise(r => setTimeout(r, 5));
+                }
             }
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 4;
@@ -506,7 +518,6 @@ function initOpen() {
         if (key(smoothed[smoothed.length - 1]) !== key(path[path.length - 1])) {
             smoothed.push(path[path.length - 1]);
         }
-        console.log("Smoothed path:", smoothed);
         return smoothed;
     }
 
@@ -516,7 +527,7 @@ function initOpen() {
         drawLineBetween(openStart, openEnd);
     };
 
-    drawLineBetween = function(start, end) {
+    drawLineBetween = async function(start, end) {
         const openSet = [];
         const closedSet = new Set();
         const cameFrom = new Map();
@@ -596,7 +607,6 @@ function initOpen() {
                 path.reverse();
                 const currentKey = key(curr);
                 const currentG = gScore.get(currentKey);
-                weightDisplay.innerHTML = `Total Path Weight: ${currentG.toFixed(2)}`;
                 const smoothed = smoothPath(path, isBlocked);
                 openPath = smoothed;
                 drawGrid();
@@ -620,6 +630,9 @@ function initOpen() {
                         openSet.push(neighbor);
                     }
                 }
+            }
+            if (openAnimationToggle.checked) {
+                await new Promise(r => setTimeout(r, 5));
             }
         }
 
