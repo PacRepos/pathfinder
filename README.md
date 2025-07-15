@@ -10,5 +10,9 @@
   * Toggleable movement: diagonal directions included vs. only cardinal directions
   * Total path weight of the optimal solution
 ### Open mode contains features like:
-  * WIP
+  * Light/Dark Mode
+  * A draggable, infinite map
+  * Snapping walls for easier wall connection
+  * 1px weighted pathfinding (with smoothing for a best path)
+  * Total path weight of the optimal solution
 ### Visit it [here](https://pacrepos.github.io/pathfinder/)!
