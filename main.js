@@ -505,6 +505,7 @@ function initOpen() {
         if (key(smoothed[smoothed.length - 1]) !== key(path[path.length - 1])) {
             smoothed.push(path[path.length - 1]);
         }
+        console.log("Smoothed path:", smoothed);
         return smoothed;
     }
 
