@@ -486,6 +486,7 @@ function initOpen() {
     }
 
     function smoothPath(path, isBlocked) {
+        const key = (p) => `${p.x},${p.y}`;
         if (path.length <= 2) return path;
         const smoothed = [];
         let i = 0;
