@@ -325,8 +325,6 @@ let spacing = 1;
 let offsetX = 0, offsetY = 0;
 let drag = false, startX, startY;
 let wallDrawStart = null;
-const openAnimationToggle = document.getElementById('openAnimate');
-const openWeightDisplay = document.getElementById('openWeightDisplay');
 
 function toggleMode() {
     const isOpenMode = document.getElementById('modeSwitch').innerHTML.includes('open');
@@ -373,6 +371,8 @@ function setOpenMode(m) {
 function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
+    const openAnimationToggle = document.getElementById('openAnimate');
+    const openWeightDisplay = document.getElementById('openWeightDisplay');
 
     async function drawGrid() {
         openWeightDisplay.innerHTML = 'Total Path Weight: Uncalculated';
