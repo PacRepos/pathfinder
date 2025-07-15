@@ -165,4 +165,9 @@ body.light-mode #openMap {
   background-color: #ddd;
   border: 1px solid #ccc;
 }
+#openWeightDisplay {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 

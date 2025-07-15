@@ -340,7 +340,6 @@ function toggleMode() {
             <button onclick="drawOpenPath()">Calculate Path</button>
             <button onclick='clearOpenPath()'>Clear Path</button>
             <button onclick='resetOpen()'>Reset</button>
-            <label><input type='checkbox' id='openAnimate' checked> Show Pathfinding Animation</label>
         `;
         main.innerHTML = `
             <div id='openWeightDisplay'></div>
@@ -371,7 +370,6 @@ function setOpenMode(m) {
 function initOpen() {
     const canvas = document.getElementById('openMap');
     const ctx = canvas.getContext('2d');
-    const openAnimationToggle = document.getElementById('openAnimate');
     const openWeightDisplay = document.getElementById('openWeightDisplay');
 
     async function drawGrid() {
@@ -390,9 +388,6 @@ function initOpen() {
             ctx.moveTo(openPath[0].x * spacing - offsetX, openPath[0].y * spacing - offsetY);
             for (let p of openPath) {
                 ctx.lineTo(p.x * spacing - offsetX, p.y * spacing - offsetY);
-                if (openAnimationToggle.checked) {
-                    await new Promise(r => setTimeout(r, 5));
-                }
             }
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 4;
@@ -630,9 +625,6 @@ function initOpen() {
                         openSet.push(neighbor);
                     }
                 }
-            }
-            if (openAnimationToggle.checked) {
-                await new Promise(r => setTimeout(r, 5));
             }
         }
 
