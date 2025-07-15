@@ -235,7 +235,7 @@ async function startAStar() {
                     }
                 }
             }
-            weightDisplay.innerHTML = `Total Path Weight: ${current.g.toFixed(2)}`;
+            weightDisplay.innerHTML = `Total Path Weight: ${current.g.toFixed(2)} cells`;
             return;
         }
 
@@ -320,6 +320,7 @@ let openMode = 'nothing';
 let wallSegments = [], openStart = null, openEnd = null;
 let drawOpenPath, drawLineBetween;
 let clearOpenPath, resetOpen;
+let updateRadius;
 let openPath = null;
 let spacing = 1;
 let offsetX = 0, offsetY = 0;
@@ -342,6 +343,7 @@ function toggleMode() {
             <button onclick="setOpenMode('wall')">Add/Remove Wall</button>
             <button onclick="drawOpenPath()">Calculate Path</button>
             <button onclick='clearOpenPath()'>Clear Path</button>
+            <label>Pathfinding Radius: <input type='number' id='radiusInput' value='1' min='1' onchange='updateRadius()'></label>
             <button onclick='resetOpen()'>Reset</button>
         `;
         main.innerHTML = `
@@ -385,7 +387,7 @@ function initOpen() {
                 const dy = openPath[i].y - openPath[i - 1].y;
                 totalWeight += Math.sqrt(dx * dx + dy * dy);
             }
-            openWeightDisplay.innerHTML = `Total Path Weight: ${totalWeight.toFixed(2)}`;
+            openWeightDisplay.innerHTML = `Total Path Weight: ${totalWeight.toFixed(2) * spacing} px`;
 
             ctx.beginPath();
             ctx.moveTo(openPath[0].x * spacing - offsetX, openPath[0].y * spacing - offsetY);
@@ -533,6 +535,14 @@ function initOpen() {
         return smoothed;
     }
 
+    updateRadius = function() {
+        const input = document.getElementById('radiusInput');
+        if (!input.value || isNaN(input.value) || input.value < 1) {
+            alert("The minimum path radius is 1.");
+        }
+        spacing = Math.max(1, parseInt(input.value));
+    };
+
     drawOpenPath = function() {
         if (!openStart || !openEnd) return alert('Place both start and end points.');
         drawGrid();
@@ -679,6 +689,7 @@ function initOpen() {
         openPath = null;
         offsetX = 0;
         offsetY = 0;
+        spacing = 1;
         drag = false;
         wallDrawStart = null;
         drawGrid();
