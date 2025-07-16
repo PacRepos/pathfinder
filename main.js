@@ -315,7 +315,6 @@ function clearColoring() {
 */
 
 
-/* Some cleanup here for the toggling */
 let openMode = 'nothing';
 let wallSegments = [], openStart = null, openEnd = null;
 let drawOpenPath, drawLineBetween;
@@ -487,7 +486,7 @@ function initOpen() {
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
 
-        const zoomFactor = 1.0;
+        const zoomFactor = 1.05; // 5% per step
         const mouseX = e.offsetX;
         const mouseY = e.offsetY;
         const worldBeforeZoom = canvasToWorld(mouseX, mouseY);
