@@ -11,8 +11,8 @@
   * Total path weight of the optimal solution
 ### Open mode contains features like:
   * Light/Dark Mode
-  * A draggable, infinite map
+  * A draggable, scrollable, infinite map
   * Snapping walls for easier wall connection
-  * 1px weighted pathfinding (with smoothing for a best path)
+  * Pathfinding with a smoothing algorithm for more realistic pathing
   * Total path weight of the optimal solution
 ### Visit it [here](https://pacrepos.github.io/pathfinder/)!
