@@ -19,8 +19,8 @@ Pathfinder Visualizer
 -------- GRID MODE --------
 */
 
-
-
+// info box text toggle
+let currentModeType = 'grid';
 
 // GRID SIZE:
 let ROWS = 50, COLS = 50;
@@ -333,8 +333,12 @@ function toggleMode() {
     const sidebar = document.getElementById('sidebar');
     const main = document.getElementById('main');
     if (isOpenMode) {
+        currentModeType = 'open';
         sidebar.innerHTML = `
-            <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
+            <div id="topBar">
+                <button id="modeSwitch" onclick="toggleMode()">Switch to grid mode</button>
+                <button id="infoButton" onclick="toggleInfo()">ℹ️</button>
+            </div>
             <span id="themeToggle" onclick="toggleTheme()">🌙</span>
             <button onclick="setOpenMode('start')">Place Start</button>
             <button onclick="setOpenMode('end')">Place End</button>
@@ -384,7 +388,7 @@ function initOpen() {
                 const dy = openPath[i].y - openPath[i - 1].y;
                 totalWeight += Math.sqrt(dx * dx + dy * dy);
             }
-            openWeightDisplay.innerHTML = `Total Path Weight: ${totalWeight.toFixed(2)} px`;
+            openWeightDisplay.innerHTML = `Total Path Weight: ${totalWeight.toFixed(2)}`;
 
             ctx.beginPath();
             ctx.moveTo(openPath[0].x * spacing - offsetX, openPath[0].y * spacing - offsetY);
@@ -708,3 +712,30 @@ function initOpen() {
 ----------- INITIALIZATION --------
 */
 createGrid();
+
+function toggleInfo() {
+    const panel = document.getElementById('infoPanel');
+    const paragraph = panel.querySelector('p');
+
+    if (currentModeType === 'grid') {
+        paragraph.innerHTML = "Press the moon/sun to toggle between dark/light mode.<br>You can adjust Row/Column size using the two inputs."
+        + "Set a start and end point by clicking the buttons and then selecting a cell."
+        + "<br>To set walls click on the Add/Remove Wall button and click and drag to quickly place walls, or click on each individual cell."
+        + " Clicking again on a cell with a wall will remove it.<br>You can also change the weight of a cell by adjusting the desired weight"
+        + " value in the input and then clicking on Change Weight and selecting the cell to change the weight of. Changing a cell to a weight of"
+        + " one will reset it.<br>Click Start Pathfinding to draw the path search and highlight the best path. Clear just the path or reset the"
+        + " whole grid with the Clear Pathfinding and Reset buttons.<br>Lastly, toggle cardinal/diagonal movement and toggle the pathfinding"
+        + " animation with the Allow Diagonal Movement and Show Pathfinding Animation checkboxes.";
+    } else {
+        paragraph.innerHTML = "Press the moon/sun to toggle between dark/light mode.<br>The map is infinite (drag while in Place Start or"
+        + " Place End mode to reveal more of the map) and is scrollable (scroll to zoom in and out).<br>Place your start and end points"
+        + " with the Place Start and Place End buttons.<br>You can set and remove walls by selecting the Add Wall button. Click, drag"
+        + " your mouse, and release to draw a wall. While drawing your wall, coming close to an endpoint of another line will reveal an"
+        + " orange circle that means release will snap your line to the endpoint of the other line. Hovering over a line will highlight"
+        + " it red, and clicking while a line is red will delete it.<br>Calculate the shortest path (with smoothing) with the Calculate"
+        + " Path button (note complex paths will take a few seconds to a minute to load).<br>Lastly, clear the path or reset the whole"
+        + " map with the Clear Path and Reset buttons.";
+    }
+
+    panel.classList.toggle('hidden');
+}

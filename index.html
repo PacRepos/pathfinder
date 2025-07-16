@@ -20,7 +20,10 @@
     <body>
         <div id="app">
             <div id="sidebar">
-                <button id="modeSwitch" onclick="toggleMode()">Switch to open mode</button>
+                <div id="topBar">
+                    <button id="modeSwitch" onclick="toggleMode()">Switch to open mode</button>
+                    <button id="infoButton" onclick="toggleInfo()">ℹ️</button>
+                </div>
                 <span id="themeToggle" onclick="toggleTheme()">🌙</span>
 
                 <label>Rows: <input type='number' id='rowsInput' value='50' min='5' onchange='resizeGrid()'></label>
@@ -33,7 +36,7 @@
                 <button onclick='setMode("weight")'>Change Weight</button>
                 <label>Weight Value: <input type='number' id='weightInput' value='2' min='1' onchange='updateWeight()'></label>
 
-                <button onclick='startAStar()'>Start Algorithm (A*)</button>
+                <button onclick='startAStar()'>Start Pathfinding</button>
                 <button onclick='clearPath()'>Clear Pathfinding</button>
 
                 <button onclick='resetGrid()'>Reset</button>
@@ -47,6 +50,11 @@
             </div>
             
             <script src="main.js"></script>
+        </div>
+
+        <div id="infoPanel" class="hidden">
+            <button id="closeInfo" onclick="toggleInfo()">✖</button>
+            <p></p>
         </div>
 
         <footer>

@@ -171,3 +171,63 @@ body.light-mode #openMap {
   margin-bottom: 10px;
 }
 
+#topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#infoButton {
+  background-color: #34495e;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#infoButton:hover {
+  background-color: #3e5871;
+}
+body.light-mode #infoButton {
+  background-color: #bdc3c7;
+  color: black;
+}
+body.light-mode #infoButton:hover {
+  background-color: #aab7b8;
+}
+
+#infoPanel {
+  position: fixed;
+  top: 60px;
+  left: 22vw;
+  width: 300px;
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  transition: opacity 0.3s ease;
+}
+body.light-mode #infoPanel {
+  background-color: #ecf0f1;
+  color: black;
+}
+
+#infoPanel.hidden {
+  display: none;
+}
+
+#infoPanel #closeInfo {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: transparent;
+  color: inherit;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
